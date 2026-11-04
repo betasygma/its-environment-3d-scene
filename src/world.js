@@ -1,0 +1,243 @@
+// world.js - scene composition and movement. THIS is the file to edit for scene layout
+// and animation; the engine (math, scene, gl, shaders, main) stays as it is.
+//
+// WORLD.build(world, models)  : called once. `models[name]` is the root SceneNode of each
+//                               model listed in SCENE_CONFIG.models; add them under `world`.
+// WORLD.update(dt, t, input)  : called every frame in live mode. dt/t in seconds,
+//                               input.keys[code] is true while a key is held.
+//
+// Scene tree (deliverable f is generated from this structure by tools/scene_tree.js):
+//   world
+//   +-- ground
+//   +-- excavator              (drives: position + heading)
+//   |   +-- undercarriage      (tracks, fixed to the excavator root)
+//   |       +-- upper          (slew joint: rotates about the vertical axis)
+//   +-- roller                 (drives along gravel strip)
+//   |   +-- rear_frame         (chassis, cab, hood)
+//   |       +-- wheel_l        (rotates about axle)
+//   |       +-- wheel_r        (rotates about axle)
+//   |       +-- front_frame    (articulation joint)
+//   |           +-- drum       (rotates about axle)
+//   +-- props                  (site environment & backdrop)
+//       +-- drum_stand_1, drum_stand_2, drum_lying, gravel_pile, dirt_pile,
+//           tree_1, tree_2, tree_3, building
+
+var WORLD = (function () {
+  var excavator = null, upper = null;
+  var roller = null, drum = null, wheelL = null, wheelR = null, frontFrame = null;
+
+  var DRIVE_SPEED = 2.0;               // m/s
+  var TURN_SPEED = 0.5;                // rad/s
+  var SLEW_SPEED = 0.6;                // rad/s
+
+  // Roller parameters
+  var ROLLER_SPEED = 1.2;              // m/s
+  var ROLLER_DRUM_R = 0.75;            // drum & wheel radius in metres
+  var ROLLER_MIN_X = -8.0;             // travel range along gravel strip
+  var ROLLER_MAX_X = 4.0; 
+  var rollerDir = 1.0;
+  var rollerDist = 0.0;                // distance traveled along drive path
+
+  // Mode and auto cycle parameters
+  // B7: auto animation by default, any W/A/S/D/Q/E key switches to manual, Space toggles back
+  var mode = 'auto';                   // 'auto' or 'manual'
+  var spaceWasDown = false;
+  var autoTime = 0.0;
+  var CYCLE_PERIOD = 12.0;             // seconds for one complete seamless cycle
+
+  function updateStatusLabel() {
+    if (typeof document !== 'undefined') {
+      var el = document.getElementById('mode-label');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'mode-label';
+        el.style.position = 'fixed';
+        el.style.left = '8px';
+        el.style.top = '8px';
+        el.style.font = '13px monospace';
+        el.style.color = '#eee';
+        el.style.background = 'rgba(0,0,0,0.6)';
+        el.style.padding = '4px 8px';
+        el.style.borderRadius = '4px';
+        el.style.pointerEvents = 'none';
+        document.body.appendChild(el);
+      }
+      el.textContent = 'Mode: ' + mode.toUpperCase() + ' (WASD/QE: manual | Space: toggle)';
+    }
+  }
+
+  function getAutoPose(t) {
+    // Cycle:
+    // [0, 3s]: Drive forward from X=0 to X=3m
+    // [3, 4s]: Pause
+    // [4, 6s]: Slew upper left by 90 deg (pi/2)
+    // [6, 7s]: Pause
+    // [7, 9s]: Slew back from 90 deg to 0 deg
+    // [9, 12s]: Drive back from X=3m to X=0
+    var phase = ((t % CYCLE_PERIOD) + CYCLE_PERIOD) % CYCLE_PERIOD;
+    var x = 0, slew = 0;
+
+    if (phase < 3.0) {
+      x = (phase / 3.0) * 3.0;
+      slew = 0.0;
+    } else if (phase < 4.0) {
+      x = 3.0;
+      slew = 0.0;
+    } else if (phase < 6.0) {
+      x = 3.0;
+      var f = (phase - 4.0) / 2.0;
+      slew = f * (Math.PI / 2);
+    } else if (phase < 7.0) {
+      x = 3.0;
+      slew = Math.PI / 2;
+    } else if (phase < 9.0) {
+      x = 3.0;
+      var f2 = (phase - 7.0) / 2.0;
+      slew = (1.0 - f2) * (Math.PI / 2);
+    } else {
+      var f3 = (phase - 9.0) / 3.0;
+      x = (1.0 - f3) * 3.0;
+      slew = 0.0;
+    }
+    return { x: x, slew: slew };
+  }
+
+  function build(world, models) {
+    if (models.ground) world.add(models.ground);
+
+    excavator = models.excavator || null;
+    if (excavator) {
+      excavator.axis = [0, 1, 0];       // heading: rotation of the whole machine about +Y
+      excavator.angle = 0;              // 0 = facing +X
+      world.add(excavator);
+      upper = excavator.find('upper');
+    }
+
+    roller = models.roller || null;
+    if (roller) {
+      roller.pivot = [0, 0.75, 5.5];
+      roller.axis = [0, 1, 0];
+      roller.angle = 0;
+      world.add(roller);
+
+      drum = roller.find('drum');
+      wheelL = roller.find('wheel_l');
+      wheelR = roller.find('wheel_r');
+      frontFrame = roller.find('front_frame');
+    }
+
+    var props = models.props || null;
+    if (props) {
+      world.add(props);
+
+      var d1 = props.find('drum_stand_1');
+      if (d1) d1.pivot = [8.0, 0, 3.1];
+
+      var d2 = props.find('drum_stand_2');
+      if (d2) d2.pivot = [9.0, 0, 3.4];
+
+      var dl = props.find('drum_lying');
+      if (dl) dl.pivot = [8.5, 0, 4.8];
+
+      var gp = props.find('gravel_pile');
+      if (gp) gp.pivot = [-8.0, 0, -3.0];
+
+      var dp = props.find('dirt_pile');
+      if (dp) dp.pivot = [12.0, 0, -4.0];
+
+      var t1 = props.find('tree_1');
+      if (t1) t1.pivot = [-11.0, 0, -8.0];
+
+      var t2 = props.find('tree_2');
+      if (t2) t2.pivot = [0.0, 0, -11.0];
+
+      var t3 = props.find('tree_3');
+      if (t3) t3.pivot = [10.5, 0, -8.5];
+
+      var bldg = props.find('building');
+      if (bldg) bldg.pivot = [0.0, 0, -16.0];
+    }
+
+    updateStatusLabel();
+  }
+
+  function update(dt, t, input) {
+    var k = input.keys || {};
+
+    // Check manual override keys
+    var manualKeys = k.KeyW || k.KeyA || k.KeyS || k.KeyD || k.KeyQ || k.KeyE;
+    if (manualKeys) {
+      mode = 'manual';
+    }
+
+    // Space toggles between auto and manual
+    if (k.Space && !spaceWasDown) {
+      mode = (mode === 'auto') ? 'manual' : 'auto';
+    }
+    spaceWasDown = !!k.Space;
+
+    updateStatusLabel();
+
+    // --- Excavator control (auto or manual) ---
+    if (excavator) {
+      if (mode === 'auto') {
+        autoTime += dt;
+        var pose = getAutoPose(autoTime);
+        excavator.pivot = [pose.x, excavator.pivot[1], excavator.pivot[2]];
+        excavator.angle = 0;
+        if (upper) upper.setAngle(pose.slew);
+      } else {
+        // Manual control
+        if (upper) {
+          if (k.KeyQ) upper.setAngle(upper.angle + SLEW_SPEED * dt);
+          if (k.KeyE) upper.setAngle(upper.angle - SLEW_SPEED * dt);
+        }
+
+        if (k.KeyA) excavator.angle += TURN_SPEED * dt;
+        if (k.KeyD) excavator.angle -= TURN_SPEED * dt;
+        var dir = 0;
+        if (k.KeyW) dir += 1;
+        if (k.KeyS) dir -= 1;
+        if (dir) {
+          var a = excavator.angle;
+          excavator.pivot = [
+            excavator.pivot[0] + Math.cos(a) * DRIVE_SPEED * dir * dt,
+            excavator.pivot[1],
+            excavator.pivot[2] - Math.sin(a) * DRIVE_SPEED * dir * dt
+          ];
+        }
+      }
+    }
+
+    // --- Road roller animation ---
+    if (roller) {
+      var step = ROLLER_SPEED * dt * rollerDir;
+      roller.pivot[0] += step;
+      rollerDist += step;
+
+      if (roller.pivot[0] >= ROLLER_MAX_X) {
+        roller.pivot[0] = ROLLER_MAX_X;
+        rollerDir = -1.0;
+      } else if (roller.pivot[0] <= ROLLER_MIN_X) {
+        roller.pivot[0] = ROLLER_MIN_X;
+        rollerDir = 1.0;
+      }
+
+      var rot = rollerDist / ROLLER_DRUM_R;
+      if (drum) drum.angle = rot;
+      if (wheelL) wheelL.angle = rot;
+      if (wheelR) wheelR.angle = rot;
+    }
+  }
+
+  return {
+    build: build,
+    update: update,
+    getAutoPose: getAutoPose,
+    setMode: function (m) { mode = m; },
+    getMode: function () { return mode; },
+    CYCLE_PERIOD: CYCLE_PERIOD
+  };
+})();
+
+if (typeof module !== 'undefined') module.exports = WORLD;
