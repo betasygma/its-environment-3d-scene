@@ -1,0 +1,54 @@
+{
+  "_about": "Import settings for the Meshy excavator. Measured by Opus from the raw mesh (glTF frame, Y-up, machine faces -X in the source). Do not change without re-measuring.",
+  "source": "meshy-model-2026-11-04T13-34-55-824Z.glb",
+  "model_name": "excavator",
+  "scale_m_per_unit": 3.92,
+  "slew_centre_src": [
+    0.288,
+    0.0
+  ],
+  "ground_y_src": -0.541,
+  "cut_y_src": -0.305,
+  "undercarriage_region_src": {
+    "x_min": -0.27,
+    "x_max": 0.86,
+    "z_abs_max": 0.36
+  },
+  "rotate_y_deg": 180,
+  "parts": {
+    "undercarriage": {
+      "target_tris": 70000,
+      "parent": null,
+      "texture": "excavator_base"
+    },
+    "upper": {
+      "target_tris": 90000,
+      "parent": "undercarriage",
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "texture": "excavator_base"
+    }
+  },
+  "texture": {
+    "size": 2048,
+    "jpeg_quality": 85
+  },
+  "expect": {
+    "overall_width_m": [
+      2.7,
+      2.9
+    ],
+    "track_length_m": [
+      4.0,
+      4.35
+    ],
+    "slew_pivot_height_m": [
+      0.85,
+      1.15
+    ]
+  },
+  "_ground_note": "ground = bottom of the tracks (the Meshy bucket hangs ~5 cm lower and sinks slightly into the ground)"
+}

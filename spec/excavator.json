@@ -1,0 +1,46 @@
+{
+  "_about": "Zoomlion ZE210E/ZE215E (21-ton class). Metres. 'sheet' = Zoomlion spec sheet; 'est' = estimate to verify against Ibra's photos.",
+  "machine": "Zoomlion ZE210E",
+  "overall": {
+    "transport_length": { "value": 9.57, "src": "sheet" },
+    "width": { "value": 2.80, "src": "sheet" },
+    "transport_height": { "value": 3.01, "src": "sheet" },
+    "tail_slew_radius": { "value": 2.84, "src": "sheet" },
+    "tail_length": { "value": 2.80, "src": "sheet" }
+  },
+  "undercarriage": {
+    "track_length": { "value": 4.18, "src": "sheet" },
+    "track_ground_length": { "value": 3.38, "src": "sheet" },
+    "track_gauge": { "value": 2.20, "src": "sheet" },
+    "shoe_width": { "value": 0.60, "src": "sheet" },
+    "track_height": { "value": 0.92, "src": "est" },
+    "ground_clearance": { "value": 0.46, "src": "est" }
+  },
+  "upper": {
+    "width": { "value": 2.72, "src": "est" },
+    "counterweight_clearance": { "value": 1.05, "src": "est" },
+    "cab_top_height": { "value": 3.01, "src": "sheet (transport height ~ cab top)" }
+  },
+  "front": {
+    "boom_length": { "value": 5.70, "src": "est (sheet range 5.5-5.7)" },
+    "arm_length": { "value": 2.925, "src": "est (sheet range 2.9-3.2)" },
+    "bucket_width": { "value": 1.10, "src": "est (0.9 m3 bucket)" },
+    "bucket_tip_radius": { "value": 1.45, "src": "est" }
+  },
+  "colors": {
+    "upper_body": "#8c8f91",
+    "upper_top_and_counterweight": "#3a3d40",
+    "boom": "#26292b",
+    "stick": "#8cc63f",
+    "bucket": "#3b3936",
+    "tracks": "#2b2b2a",
+    "cylinder_rod": "#c9ccce"
+  },
+  "hierarchy": [
+    { "part": "undercarriage", "parent": null },
+    { "part": "upper", "parent": "undercarriage", "joint": "slew", "axis": [0, 1, 0] },
+    { "part": "boom", "parent": "upper", "joint": "boom", "axis": [0, 0, 1], "limits_deg": [-25, 60] },
+    { "part": "stick", "parent": "boom", "joint": "stick", "axis": [0, 0, 1], "limits_deg": [-150, -35] },
+    { "part": "bucket", "parent": "stick", "joint": "bucket", "axis": [0, 0, 1], "limits_deg": [-170, 10] }
+  ]
+}

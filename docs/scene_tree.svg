@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2160 555" width="2160" height="555" style="background:#171923;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- Connection Lines -->
+  <g id="connections">
+    <path d="M 705 53 C 705 80.5, 30 80.5, 30 108" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 30 154 C 30 181.5, 30 181.5, 30 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 705 53 C 705 80.5, 180 80.5, 180 108" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 180 154 C 180 181.5, 180 181.5, 180 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 180 255 C 180 282.5, 180 282.5, 180 310" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 705 53 C 705 80.5, 480 80.5, 480 108" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 480 154 C 480 181.5, 480 181.5, 480 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 480 255 C 480 282.5, 330 282.5, 330 310" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 480 255 C 480 282.5, 480 282.5, 480 310" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 480 255 C 480 282.5, 630 282.5, 630 310" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 630 356 C 630 383.5, 630 383.5, 630 411" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 705 53 C 705 80.5, 1380 80.5, 1380 108" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 780 181.5, 780 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 930 181.5, 930 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 1080 181.5, 1080 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 1230 181.5, 1230 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 1380 181.5, 1380 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 1530 181.5, 1530 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 1680 181.5, 1680 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 1830 181.5, 1830 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+    <path d="M 1380 154 C 1380 181.5, 1980 181.5, 1980 209" fill="none" stroke="#718096" stroke-width="1.5"/>
+  </g>
+  <!-- Hierarchy Boxes -->
+  <g id="boxes">
+    <g id="node-world">
+  <rect x="640" y="7" width="130" height="46" rx="6" fill="#2d3748" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="705" y="26" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">world</text>
+  <text x="705" y="42" text-anchor="middle" font-family="monospace" font-size="10" fill="#cbd5e0">[root]</text>
+</g>
+    <g id="node-ground">
+  <rect x="-35" y="108" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="30" y="127" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">ground</text>
+  <text x="30" y="143" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-ground_slab">
+  <rect x="-35" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="30" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">ground_slab</text>
+  <text x="30" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-excavator">
+  <rect x="115" y="108" width="130" height="46" rx="6" fill="#744210" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="180" y="127" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#fffaf0">excavator</text>
+  <text x="180" y="143" text-anchor="middle" font-family="monospace" font-size="10" fill="#fbd38d">[drive]</text>
+</g>
+    <g id="node-undercarriage">
+  <rect x="115" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="180" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">undercarriage</text>
+  <text x="180" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-upper">
+  <rect x="115" y="310" width="130" height="46" rx="6" fill="#1a365d" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="180" y="329" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ebf8ff">upper</text>
+  <text x="180" y="345" text-anchor="middle" font-family="monospace" font-size="10" fill="#90cdf4">[slew (yaw)]</text>
+</g>
+    <g id="node-roller">
+  <rect x="415" y="108" width="130" height="46" rx="6" fill="#744210" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="480" y="127" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#fffaf0">roller</text>
+  <text x="480" y="143" text-anchor="middle" font-family="monospace" font-size="10" fill="#fbd38d">[drive]</text>
+</g>
+    <g id="node-rear_frame">
+  <rect x="415" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="480" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">rear_frame</text>
+  <text x="480" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-wheel_l">
+  <rect x="265" y="310" width="130" height="46" rx="6" fill="#22543d" stroke="#38a169" stroke-width="1.5"/>
+  <text x="330" y="329" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#f0fff4">wheel_l</text>
+  <text x="330" y="345" text-anchor="middle" font-family="monospace" font-size="10" fill="#9ae6b4">[rolling]</text>
+</g>
+    <g id="node-wheel_r">
+  <rect x="415" y="310" width="130" height="46" rx="6" fill="#22543d" stroke="#38a169" stroke-width="1.5"/>
+  <text x="480" y="329" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#f0fff4">wheel_r</text>
+  <text x="480" y="345" text-anchor="middle" font-family="monospace" font-size="10" fill="#9ae6b4">[rolling]</text>
+</g>
+    <g id="node-front_frame">
+  <rect x="565" y="310" width="130" height="46" rx="6" fill="#1a365d" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="630" y="329" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#ebf8ff">front_frame</text>
+  <text x="630" y="345" text-anchor="middle" font-family="monospace" font-size="10" fill="#90cdf4">[articulation]</text>
+</g>
+    <g id="node-drum">
+  <rect x="565" y="411" width="130" height="46" rx="6" fill="#22543d" stroke="#38a169" stroke-width="1.5"/>
+  <text x="630" y="430" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#f0fff4">drum</text>
+  <text x="630" y="446" text-anchor="middle" font-family="monospace" font-size="10" fill="#9ae6b4">[rolling]</text>
+</g>
+    <g id="node-props">
+  <rect x="1315" y="108" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1380" y="127" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">props</text>
+  <text x="1380" y="143" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-drum_stand_1">
+  <rect x="715" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="780" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">drum_stand_1</text>
+  <text x="780" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-drum_stand_2">
+  <rect x="865" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="930" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">drum_stand_2</text>
+  <text x="930" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-drum_lying">
+  <rect x="1015" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1080" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">drum_lying</text>
+  <text x="1080" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-gravel_pile">
+  <rect x="1165" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1230" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">gravel_pile</text>
+  <text x="1230" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-dirt_pile">
+  <rect x="1315" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1380" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">dirt_pile</text>
+  <text x="1380" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-tree_1">
+  <rect x="1465" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1530" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">tree_1</text>
+  <text x="1530" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-tree_2">
+  <rect x="1615" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1680" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">tree_2</text>
+  <text x="1680" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-tree_3">
+  <rect x="1765" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1830" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">tree_3</text>
+  <text x="1830" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+    <g id="node-building">
+  <rect x="1915" y="209" width="130" height="46" rx="6" fill="#1a202c" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="1980" y="228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" fill="#e2e8f0">building</text>
+  <text x="1980" y="244" text-anchor="middle" font-family="monospace" font-size="10" fill="#a0aec0">[fixed]</text>
+</g>
+  </g>
+</svg>

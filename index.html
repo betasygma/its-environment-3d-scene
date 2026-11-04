@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tugas 2  Scene ITS</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #1d1f21; color: #ddd; font: 14px system-ui, sans-serif; }
+    #canvas { display: block; width: 100vw; height: 100vh; }
+    #status { position: fixed; left: 8px; bottom: 8px; margin: 0; font: 12px monospace; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <pre id="status">loading&</pre>
+
+  <script>
+    // Scene configuration. Layout and movement live in src/world.js.
+    var SCENE_CONFIG = {
+      models: ['ground', 'excavator', 'roller', 'props'],
+      camera: { target: [1, 1.8, 0], distance: 16, yaw: 1.35, pitch: 0.18 },
+      cameraPresets: {
+        1: { target: [1.0, 1.8, 0.0], distance: 14.0, yaw: 1.57, pitch: 0.15, desc: 'Photo 1 (Front View)' },
+        2: { target: [0.0, 1.8, 0.0], distance: 16.0, yaw: -2.35, pitch: 0.22, desc: 'Photo 2 (Rear-Quarter View)' },
+        3: { target: [0.5, 1.8, 0.0], distance: 15.0, yaw: 0.0, pitch: 0.12, desc: 'Photo 3 (Side View)' },
+        4: { target: [1.0, 1.8, 0.0], distance: 16.0, yaw: 0.78, pitch: 0.20, desc: 'Photo 4 (Three-Quarter View)' }
+      },
+      testCamera: { eye: [1, 3, 16], target: [1, 2, 0], up: [0, 1, 0] },
+      test: { minDrawn: 0.30, minTextureEffect: 0.25 },
+      light: {
+        sunDir: [0.6, 0.35, 0.45],
+        sunColor: [1.25, 0.95, 0.7],
+        skyColor: [0.45, 0.48, 0.55],
+        groundColor: [0.35, 0.30, 0.25]
+      }
+    };
+  </script>
+  <script src="src/math.js"></script>
+  <script src="src/scene.js"></script>
+  <script src="src/gl.js"></script>
+  <script src="src/shaders.js"></script>
+  <script src="assets/textures.js"></script>
+  <script src="assets/textures_excavator.js"></script>
+  <script src="assets/models/ground.js"></script>
+  <script src="assets/models/excavator.js"></script>
+  <script src="assets/models/roller.js"></script>
+  <script src="assets/models/props.js"></script>
+  <script src="src/world.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>

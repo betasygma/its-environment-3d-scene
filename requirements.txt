@@ -1,0 +1,6 @@
+cadquery
+pymeshlab
+numpy
+scipy
+pillow
+trimesh
