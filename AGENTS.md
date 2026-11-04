@@ -10,6 +10,7 @@ ability to explain the code and solve a live challenge — so keep code plain an
 2. `BACKLOG.md` — pick ONE card; it lists the files you may touch and the checks that define "done".
 3. `ENGINE_API.md` — how to use the engine. Read this instead of `src/*.js`.
 4. `docs/BRIEF.md` — the assignment and its checklist (only for page/deliverable work).
+   `docs/HANDOFF_SITE.md` — full spec for cards B12a-B13 (site ground, rubble, vegetation, backdrop, sky).
 5. `PROGRESS.md` — decisions so far. Append a line when you finish a card.
 
 **Never read** generated files: `assets/models/*.js`, `assets/textures*.js`, the `.glb`, `node_modules/`.
@@ -26,7 +27,7 @@ tools/                export / import / texture / check scripts
 tests/                Node tests (no browser)
 assets/               GENERATED models and textures (embedded JS)
 scene/                the team's reference photos of the real site (do not modify)
-docs/                 assignment brief, explanations for the demo
+docs/                 assignment brief, handoff specs, previews for the human (docs/previews/)
 *.glb                 Meshy source model of the excavator (input to tools/import_glb.py)
 ```
 

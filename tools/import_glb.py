@@ -26,8 +26,11 @@ DEFAULT_SPEC = os.path.join(ROOT, "spec", "import_excavator.json")
 import tempfile
 TMP_DIR = os.path.join(tempfile.gettempdir(), "tugas2_import_tmp")   # works on Windows and Linux
 MIN_COMPONENT_FACES = 50
-MAX_MODEL_BYTES = 12 * 1024 * 1024
-MAX_TEXTURE_BYTES = 3 * 1024 * 1024
+# Size limits for the embedded JS. Raised from 12/3 MB after visual review (2026-11-04): 167k tris
+# smeared the texture at UV seams; 450k tris + a 4096 texture match the Meshy original.
+MAX_MODEL_BYTES = 30 * 1024 * 1024
+MAX_TEXTURE_BYTES = 6 * 1024 * 1024
+MAX_OPPOSING_NORMALS = 0.2   # % of vertices whose normal opposes others at the same point
 
 
 def log(msg):
@@ -97,54 +100,6 @@ def drop_junk(pos, idx):
 
 def face_normals(pos, tri):
     return np.cross(pos[tri[:, 1]] - pos[tri[:, 0]], pos[tri[:, 2]] - pos[tri[:, 0]])
-
-
-def smooth_normals(pos, tri, fallback):
-    """Area-weighted smooth vertex normals.
-
-    Faces are welded by position for the averaging (so UV seams stay smooth), but a face only
-    contributes to a vertex if it lies on the same side as that vertex's own faces. Where a vertex is
-    shared by faces that point to opposite sides (thin sheets, patches whose winding follows the
-    source normals), the vertex is split in two (one per side) so every face keeps a normal that
-    agrees with its winding. Returns (new_tri, vmap, normals): vmap maps new vertices to old ones."""
-    pos = pos.astype(np.float64)
-    nv = len(pos)
-    fn = face_normals(pos, tri)          # length = 2 * area -> area weighting
-    nf = len(tri)
-    seed = np.zeros((nv, 3))
-    for k in range(3):
-        np.add.at(seed, tri[:, k], fn)
-    seed_u = seed / np.maximum(np.linalg.norm(seed, axis=1, keepdims=True), 1e-30)
-    w = weld_ids(pos.astype(np.float32))
-    cw = w[tri].reshape(-1)              # welded id per corner
-    cf = np.repeat(np.arange(nf), 3)
-    order = np.argsort(cw, kind="stable")
-    cw_s, cf_s = cw[order], cf[order]
-    ng = int(w.max()) + 1
-    start = np.searchsorted(cw_s, np.arange(ng), side="left")
-    end = np.searchsorted(cw_s, np.arange(ng), side="right")
-    vs, ve = start[w], end[w]
-    acc = np.zeros((nv, 2, 3))           # [:, 1] = same side as the seed, [:, 0] = opposite side
-    for k in range(int((ve - vs).max())):
-        j = vs + k
-        m = j < ve
-        f = cf_s[np.minimum(j, len(cf_s) - 1)]
-        side = (np.einsum("ij,ij->i", fn[f], seed_u) > 0).astype(np.int64)
-        idx = np.nonzero(m)[0]
-        acc[idx, side[idx]] += fn[f[idx]]
-    # new vertex id per corner = old * 2 + side of the corner's own face
-    own = np.einsum("fkj,fj->fk", seed_u[tri], fn) > 0          # (nf, 3)
-    new_id = tri * 2 + own.astype(np.int64)
-    used, inv = np.unique(new_id.ravel(), return_inverse=True)
-    new_tri = inv.reshape(-1, 3)
-    vmap = used // 2
-    n = acc.reshape(-1, 3)[used]
-    ln = np.linalg.norm(n, axis=1, keepdims=True)
-    bad = ln[:, 0] < 1e-20
-    n = n / np.maximum(ln, 1e-20)
-    if bad.any():
-        n[bad] = fallback[vmap[bad]]
-    return new_tri, vmap, n
 
 
 def decimate(pos, uv_out, tri, target, texpng, work):
@@ -267,10 +222,12 @@ def run_import(spec, src):
         log("  winding agreement with source normals: %.2f%% before fix-up, %.2f%% after (%d faces flipped)"
             % (pct_before, pct_after, int((~agree).sum())))
 
-        # smooth normals; fallback for degenerate welded sums = nearest source vertex normal
+        # Normals: Meshy's own smooth normal at the nearest source vertex. Do NOT recompute them
+        # from the triangles: ~15% of Meshy's triangles are wound inward (the material is
+        # doubleSided), so winding-based normals come out as a patchwork of dark triangles.
+        # The renderer lights imported parts by these normals only, ignoring winding.
         _, nnv = tree.query(dp)
-        dtri, vmap, vn = smooth_normals(dp, dtri, pn[nnv])
-        dp, duv = dp[vmap], duv[vmap]
+        vn = pn[nnv].astype(np.float64).copy()
         vn /= np.maximum(np.linalg.norm(vn, axis=1, keepdims=True), 1e-12)
 
         if name == "upper":
@@ -391,16 +348,19 @@ def run_check(spec):
         tris = ni // 3
         if abs(tris - tgt) > 0.10 * tgt:
             fail("%s: %d tris outside +-10%% of target %d" % (p["name"], tris, tgt))
-        # winding vs stored normals
-        a, b, c = pos[idx[:, 0]], pos[idx[:, 1]], pos[idx[:, 2]]
-        gn = np.cross(b - a, c - a)
-        mn = nrm[idx].sum(axis=1)
-        pct = 100.0 * (np.einsum("ij,ij->i", gn, mn) > 0).mean()
-        ref = p.get("windingAgreement", 0.0)
-        if pct < 98.0:
-            fail("%s: winding/normal agreement %.2f%% < 98%%" % (p["name"], pct))
-        if ref < 98.0:
-            fail("%s: recorded source-normal agreement %.2f%% < 98%%" % (p["name"], ref))
+        # Shading consistency: vertices at the same point must not have opposing normals.
+        # Opposing normals side by side render as dark/light triangle patches (the 'camouflage'
+        # bug of the first import: 1.1% / 3.9% of vertices). Meshy's own normals give 0.00%.
+        _, inv, cnt = np.unique(np.round(pos / 1e-5).astype(np.int64), axis=0,
+                                return_inverse=True, return_counts=True)
+        inv = inv.ravel()
+        acc = np.zeros((cnt.size, 3))
+        np.add.at(acc, inv, nrm)
+        opp = 100.0 * ((np.einsum("ij,ij->i", nrm, acc[inv]) < 0) & (cnt[inv] > 1)).mean()
+        print("%s: opposing normals %.2f%%" % (p["name"], opp))
+        if opp > MAX_OPPOSING_NORMALS:
+            fail("%s: %.2f%% of vertices have normals opposing their neighbours (> %.1f%%)"
+                 % (p["name"], opp, MAX_OPPOSING_NORMALS))
 
     ex = spec["expect"]
     if "undercarriage" in geo and "upper" in geo:
@@ -420,11 +380,11 @@ def run_check(spec):
         fail("missing parts")
 
     if os.path.getsize(mp) > MAX_MODEL_BYTES:
-        fail("model JS %d bytes > 12 MB" % os.path.getsize(mp))
+        fail("model JS %d bytes > %d MB" % (os.path.getsize(mp), MAX_MODEL_BYTES // 1048576))
     if not os.path.exists(tp):
         fail("missing texture JS")
     elif os.path.getsize(tp) > MAX_TEXTURE_BYTES:
-        fail("texture JS %d bytes > 3 MB" % os.path.getsize(tp))
+        fail("texture JS %d bytes > %d MB" % (os.path.getsize(tp), MAX_TEXTURE_BYTES // 1048576))
     if fails:
         print("FAILED (%d problems)" % len(fails))
         sys.exit(1)

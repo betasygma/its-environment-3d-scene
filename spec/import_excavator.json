@@ -17,12 +17,12 @@
   "rotate_y_deg": 180,
   "parts": {
     "undercarriage": {
-      "target_tris": 70000,
+      "target_tris": 200000,
       "parent": null,
       "texture": "excavator_base"
     },
     "upper": {
-      "target_tris": 90000,
+      "target_tris": 250000,
       "parent": "undercarriage",
       "axis": [
         0,
@@ -33,7 +33,7 @@
     }
   },
   "texture": {
-    "size": 2048,
+    "size": 4096,
     "jpeg_quality": 85
   },
   "expect": {
@@ -50,5 +50,6 @@
       1.15
     ]
   },
-  "_ground_note": "ground = bottom of the tracks (the Meshy bucket hangs ~5 cm lower and sinks slightly into the ground)"
+  "_ground_note": "ground = bottom of the tracks (the Meshy bucket hangs ~5 cm lower and sinks slightly into the ground)",
+  "_detail_note": "450k tris + 4096 texture chosen after visual review: 167k smeared the texture at UV seams."
 }

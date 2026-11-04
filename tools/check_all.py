@@ -28,8 +28,31 @@ def run(label, cmd):
     return ok
 
 
+def check_encoding():
+    """Source files must be valid UTF-8 without control characters. Some agent editors on Windows
+    have corrupted characters (an em dash became byte 0x14, box-drawing chars became NUL bytes)."""
+    bad = []
+    for pat in ["*.html", "*.md", "src/*.js", "tests/*.js", "tools/*.py", "tools/*.js", "builders/*.py", "docs/*.md", "spec/*.json"]:
+        for f in glob.glob(os.path.join(ROOT, pat)):
+            b = open(f, "rb").read()
+            try:
+                b.decode("utf-8")
+                ctrl = [c for c in b if c < 32 and c not in (9, 10, 13)]
+            except UnicodeDecodeError:
+                ctrl = ["invalid UTF-8"]
+            if ctrl:
+                bad.append(f"{os.path.relpath(f, ROOT)} ({len(ctrl)} bad bytes)")
+    if bad:
+        print("FAIL encoding")
+        for b in bad:
+            print("     FAIL " + b)
+        return False
+    print("OK   encoding: all source files clean UTF-8")
+    return True
+
+
 def main():
-    results = []
+    results = [check_encoding()]
     for builder in sorted(glob.glob(os.path.join(ROOT, "builders", "*.py"))):
         name = os.path.splitext(os.path.basename(builder))[0]
         results.append(run(f"export {name}", [PY, "tools/export.py", f"builders/{name}.py"]))

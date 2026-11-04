@@ -28,7 +28,10 @@ These rules exist because breaking any of them causes silent, compounding bugs.
   taint WebGL).
 - **WebGL 1**, no libraries. CadQuery parts use `Uint16` indices (exporter fails above 65535 vertices).
   Imported (Meshy) parts may use `Uint32` (`indexType: "u32"`, via `OES_element_index_uint`).
-- Imported parts are `doubleSided` (drawn without back-face culling; the shader flips normals on back faces).
+- Imported parts are `doubleSided`: drawn without back-face culling and lit ONLY by their stored smooth normals
+  (Meshy's own). Never flip normals with `gl_FrontFacing` and never recompute them from triangle winding: ~15% of
+  Meshy's triangles are wound inward, and either of those turns the excavator into dark/light triangle patches.
+  Guarded by `tests/shading.test.js` and the opposing-normals check in `tools/import_glb.py --check`.
   CadQuery parts are closed and outward-facing (culled).
 
 ## Two geometry sources
@@ -38,4 +41,4 @@ These rules exist because breaking any of them causes silent, compounding bugs.
 
 ## Files agents must not edit without approval
 `CONVENTIONS.md`, `spec/*.json`, `src/math.js`, `src/scene.js`, existing tests in `tests/` (adding new tests is fine),
-thresholds in `tools/check_*.py` and in `SCENE_CONFIG.test`.
+thresholds in `tools/check_*.py`, `tools/import_glb.py` and in `SCENE_CONFIG.test`.

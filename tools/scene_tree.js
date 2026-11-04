@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// tools/scene_tree.js  generates docs/scene_tree.svg from the live scene graph.
+// tools/scene_tree.js - generates docs/scene_tree.svg from the live scene graph.
 // Usage: node tools/scene_tree.js
 
 var fs = require('fs');

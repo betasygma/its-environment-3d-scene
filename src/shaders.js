@@ -40,7 +40,6 @@ SHADERS.litFS = [
   'uniform float uSpecular;',
   'void main() {',
   '  vec3 N = normalize(vNormal);',
-  '  if (!gl_FrontFacing) N = -N;',                                // double-sided parts: light the back side too
   '  vec3 L = normalize(uSunDir);',
   '  vec3 V = normalize(uCameraPos - vWorldPos);',
   '  vec3 H = normalize(L + V);',                                   // Blinn-Phong half vector

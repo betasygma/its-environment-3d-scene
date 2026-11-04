@@ -1,0 +1,16 @@
+{
+  "_about": "Crop boxes (fractions of width/height: x0, y0, x1, y1) in the team's own photos in scene/. Verified by eye on 2026-11-04: no machines, bottles or people inside. Re-verify with the contact sheet if you change any.",
+  "textures": {
+    "site_road":    { "photo": "IMG-20261104-WA0017.jpg", "crop": [0.03, 0.70, 0.27, 0.92], "size": 1024, "tile": true,  "note": "compacted white limestone with tyre tracks" },
+    "site_rubble":  { "photo": "IMG-20261104-WA0016.jpg", "crop": [0.05, 0.80, 0.55, 0.98], "size": 1024, "tile": true,  "note": "loose white limestone chunks" },
+    "site_leaves":  { "photo": "IMG-20261104-WA0014.jpg", "crop": [0.62, 0.87, 0.98, 0.99], "size": 512,  "tile": true,  "note": "dry leaf litter and small stones (verges)" },
+    "site_weeds":   { "photo": "IMG-20261104-WA0015.jpg", "crop": [0.55, 0.76, 0.95, 0.96], "size": 512,  "tile": true,  "note": "green/brown weeds (ground cover near the drain)" },
+    "site_water":   { "photo": "IMG-20261104-WA0015.jpg", "crop": [0.06, 0.74, 0.24, 0.86], "size": 512,  "tile": true,  "note": "puddle water reflecting the dusk sky" },
+    "site_trees_a": { "photo": "IMG-20261104-WA0015.jpg", "crop": [0.22, 0.08, 0.51, 0.44], "size": 1024, "tile": false, "alpha": "sky", "note": "rain-tree silhouettes for the backdrop (sky removed)" },
+    "site_trees_b": { "photo": "IMG-20261104-WA0016.jpg", "crop": [0.00, 0.05, 0.34, 0.44], "size": 1024, "tile": false, "alpha": "sky", "note": "rain trees + bushes for the backdrop (sky removed)" }
+  },
+  "sky_alpha": {
+    "_about": "Alpha for 'sky' textures: sky = bright and unsaturated. Tested on both tree crops: clean silhouettes.",
+    "formula": "alpha = max(clamp((0.70 - lum) / 0.12, 0, 1), clamp((sat - 0.25) / 0.10, 0, 1) * (lum < 0.85)); lum = mean(rgb), sat = max(rgb) - min(rgb), rgb in [0,1]"
+  }
+}

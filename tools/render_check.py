@@ -19,7 +19,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 FLAGS = ["--headless=new", "--no-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
-         "--allow-file-access-from-files", "--virtual-time-budget=8000", "--hide-scrollbars"]
+         # Real-time wait (not --virtual-time-budget): texture decoding happens in real time, and a
+         # virtual clock can run out before the images are ready, making the check flaky.
+         "--allow-file-access-from-files", "--timeout=30000", "--hide-scrollbars"]
 
 
 WINDOWS_PATHS = [

@@ -4,7 +4,12 @@ Pick the first card whose status is `todo` and whose "needs" are done. One card 
 When finished: run `python3 tools/check_all.py`, set the status to `done`, add one line to PROGRESS.md.
 Cards marked **[human]** need the team; do not invent their content (names, task split, video).
 
-Suggested order: B3 → B4 → B7 → B6 → B5 → B2 → B1 → B10, then optional B8 / B9.
+**"Done" means proven.** Every behaviour a card claims (a key, a movement, a placement) needs a test that FAILS
+without it. Config values and docs alone are not an implementation. Before marking done, re-read the card's
+"Done when" and check each item exists in code, not only in config or docs. (B6 was once marked done with no code.)
+Write source files as plain UTF-8; prefer ASCII (`-` not `—`, `+--` not `├──`): some editors here corrupt other characters.
+
+Suggested order: B6 → B12a → B12b → B12c → B13 → B11 → B5 → B1 → B10, then optional B8 / B9. (B2, B3, B4, B7 done.)
 
 ---
 ### B3 — Road roller (CadQuery, articulated) · Sonnet · done
@@ -31,14 +36,22 @@ Files: `src/world.js` only.
 Done when: `tests/excavator.test.js` still passes; add tests for the cycle (positions at given times, slew limits
 respected, seamless loop: state at t = period equals t = 0).
 
-### B6 — Camera presets · Sonnet · done
+### B6 — Camera presets · Sonnet · todo (reopened 2026-11-04)
+**Reopened:** it was marked done, but only the preset values (`SCENE_CONFIG.cameraPresets` in index.html) and
+`docs/CAMERA.md` exist — no code reads them, so keys 1–4 and F do nothing. The `shot_preset*.png` files were made with
+`render_check.py --cam`, not by the feature. Keep the existing preset values and docs; implement the behaviour.
 Goal: number keys 1–4 jump to views matching the four reference photos (front, rear-quarter, side, three-quarter);
 `F` toggles a follow camera behind the moving excavator; orbit remains the default.
-Files: `src/main.js` (camera section only), `index.html` (preset values in SCENE_CONFIG), `docs/` note of the keys.
-Done when: `check_all` green; screenshots of presets 1–4 for the human to compare with the photos.
+Files: `src/camera.js` (new: pure functions — preset lookup, follow-camera pose from the excavator's world matrix;
+no DOM/GL so Node can test it), `src/main.js` (camera section only: wire Digit1–4 / KeyF to camera.js),
+`index.html` (add the script tag), `tests/camera.test.js` (new).
+Done when: `tests/camera.test.js` proves (a) each preset key yields that preset's yaw/pitch/distance/target,
+(b) the follow camera stays behind the excavator when it turns (heading 0 and 90°), (c) it fails if main.js does not
+call camera.js (grep the source); `check_all` green; screenshots of presets 1–4 taken WITH the keys (add a
+`?preset=N` URL option in main.js for this), for the human to compare with the photos.
 
 ### B5 — Lighting polish (dusk) · Opus or Sonnet · todo
-Goal: match the photos' late-afternoon light: sky gradient background (full-screen quad, not just clearColor), sun
+Goal: match the photos' late-afternoon light (the sky gradient itself is done in B12a): sun
 low and warm from behind the trees, slightly hazy distance fog, ambient tuned so dark parts keep detail.
 Optional stretch: shadow mapping (Opus — new shader pass + depth texture via WEBGL_depth_texture).
 Files: `src/shaders.js`, `src/main.js` (draw section), `index.html` (light values).
@@ -64,6 +77,30 @@ hierarchical modelling, animasi) — the idea in 3–5 sentences, the exact file
 change it live. Plus 10 likely "challenge" requests (e.g. change light colour, add a light, make the drum spin
 faster, add a child object, rotate the cab) with the minimal edit for each.
 Done when: the human has walked through it once with the agent.
+
+### B12a / B12b / B12c / B13 — Make the site look like the real place · Sonnet · todo
+Full spec in **`docs/HANDOFF_SITE.md`** (read it before starting any of these). Summary:
+- **B12a** engine features: alpha cut-outs, unlit photo panels, "fit" UVs, dusk sky; proven by an alpha probe page.
+- **B12b** `tools/photo_textures.py`: tileable textures cut from the team's photos (crops pre-verified in
+  `spec/photo_textures.json`), tree-line textures with the sky removed.
+- **B12c** ground zones (limestone road, leaf/rubble verges), concrete drain with a puddle, rubble heaps of
+  random rocks (replaces the white cone pile).
+- **B13** weed/leaf cut-out cards, a ring of 12 photo tree-line panels at 45 m, sky colours; photo comparison sheet.
+Do them in that order, one per session; each has its own "Done when".
+
+### B11 — Likeness pass on the CadQuery objects · Sonnet · todo · needs: none
+The human compared the scene with the photos (`scene/*.jpg`): the excavator now matches, the rest does not yet.
+- **Building:** it is a tall peach tower; the real one is a low (2-storey) white building with a flat roof and dark
+  windows, far behind the site. Rebuild at realistic scale (about 7 m tall) and white facade colour.
+- **Road roller:** currently stacked boxes. Real one: yellow body, open cab with a canopy roof on posts, dark steel drum
+  inside a yellow frame, black rear tyres. Add the canopy, frame and tyre detail; keep the hierarchy and tests.
+- **Trees:** stacked hexagons look like toys. The site trees are large rain trees with wide, flat-topped spreading
+  canopies on thin trunks (several canopy lobes per tree, 8-15 m wide).
+- **Ground:** handled by B12c (photo textures). Not part of this card any more.
+- Trees here means the 2-3 NEAR trees; the far tree line is the B13 backdrop.
+Files: `builders/props.py`, `builders/roller.py`, `tools/build_textures.py` (texture functions), `src/world.js` (positions only).
+Done when: exports + geometry checks OK, roller/layout tests still pass, `check_all` green, and one screenshot per
+reference photo angle beside that photo for the human (who decides when it is done).
 
 ---
 ### B8 — Normal mapping for the excavator (optional) · Opus · todo
