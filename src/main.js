@@ -1,4 +1,4 @@
-// main.js — sets up WebGL, builds the scene from window.MODELS, runs the render loop.
+// main.js  sets up WebGL, builds the scene from window.MODELS, runs the render loop.
 // Modes (from the URL query string):
 //   (none)  interactive: drag to orbit, wheel to zoom
 //   ?test   headless self-check: renders from SCENE_CONFIG.testCamera, writes a one-line result
@@ -40,19 +40,62 @@
 
   // ---- camera ----
   var cam = { target: cfg.camera.target.slice(), distance: cfg.camera.distance, yaw: cfg.camera.yaw, pitch: cfg.camera.pitch };
-  // Optional ?cam=yaw,pitch,distance (radians, metres) — used for screenshots from a chosen angle.
+  var followCam = false;
+
+  // Optional ?preset=N to jump straight to preset N
+  var presetParam = /[?&]preset=([1-4])/.exec(location.search);
+  if (presetParam && cfg.cameraPresets) {
+    var pInit = CAMERA.getPreset(cfg.cameraPresets, presetParam[1]);
+    if (pInit) {
+      cam.target = pInit.target.slice();
+      cam.distance = pInit.distance;
+      cam.yaw = pInit.yaw;
+      cam.pitch = pInit.pitch;
+    }
+  }
+
+  // Optional ?cam=yaw,pitch,distance (radians, metres)  used for screenshots from a chosen angle.
   var camParam = /[?&]cam=([-\d.]+),([-\d.]+),([-\d.]+)/.exec(location.search);
   if (camParam) { cam.yaw = +camParam[1]; cam.pitch = +camParam[2]; cam.distance = +camParam[3]; }
-  function cameraEye() {
-    var cp = Math.cos(cam.pitch);
-    return [cam.target[0] + cam.distance * cp * Math.sin(cam.yaw),
-            cam.target[1] + cam.distance * Math.sin(cam.pitch),
-            cam.target[2] + cam.distance * cp * Math.cos(cam.yaw)];
+
+  function getCameraPose() {
+    if (followCam && world) {
+      var exc = world.find('excavator');
+      if (exc) return CAMERA.followPose(exc);
+    }
+    return {
+      eye: CAMERA.orbitEye(cam.target, cam.distance, cam.yaw, cam.pitch),
+      target: cam.target
+    };
   }
+
+  function cameraEye() {
+    return getCameraPose().eye;
+  }
+
   // Keyboard state for WORLD.update (e.g. input.keys['KeyQ'] === true while Q is held).
   var input = { keys: {} };
   if (mode === 'live') {
-    window.addEventListener('keydown', function (e) { input.keys[e.code] = true; });
+    window.addEventListener('keydown', function (e) {
+      input.keys[e.code] = true;
+      if (cfg.cameraPresets) {
+        var num = e.key;
+        if (e.code && e.code.indexOf('Digit') === 0) num = e.code.replace('Digit', '');
+        var preset = CAMERA.getPreset(cfg.cameraPresets, num);
+        if (preset) {
+          followCam = false;
+          cam.target = preset.target.slice();
+          cam.distance = preset.distance;
+          cam.yaw = preset.yaw;
+          cam.pitch = preset.pitch;
+          setStatus('Camera: ' + (preset.desc || ('Preset ' + num)));
+        }
+      }
+      if (e.code === 'KeyF') {
+        followCam = !followCam;
+        setStatus('Camera: ' + (followCam ? 'Follow (excavator)' : 'Orbit'));
+      }
+    });
     window.addEventListener('keyup', function (e) { input.keys[e.code] = false; });
     var dragging = false, lastX = 0, lastY = 0;
     canvas.addEventListener('mousedown', function (e) { dragging = true; lastX = e.clientX; lastY = e.clientY; });
@@ -93,7 +136,7 @@
       view = Mat4.lookAt(eye, cfg.testCamera.target, cfg.testCamera.up);
     } else {
       eye = cameraEye();
-      view = Mat4.lookAt(eye, cam.target, [0, 1, 0]);
+      view = Mat4.lookAt(eye, getCameraPose().target, [0, 1, 0]);
     }
     var proj = Mat4.perspective(Math.PI / 4, canvas.width / canvas.height, 0.1, 200);
 
@@ -118,9 +161,9 @@
       gl.uniformMatrix3fv(u.uNormalMatrix, false, Mat4.normalMatrix(node.world));
       gl.uniform3fv(u.uBaseColor, node.color);
       gl.uniform1f(u.uShininess, 24.0);
-      gl.uniform1f(u.uSpecular, 0.15);
-      gl.activeTexture(gl.TEXTURE0);
+      gl.uniform1f(u.uSpecular, 0.25);
       if (node.texture && !noTextures) {
+        gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, GLX.getTexture(gl, node.texture));
         gl.uniform1f(u.uUseTexture, 1.0);
       } else {
@@ -131,7 +174,7 @@
   }
 
   // ---- self-check used by tools/render_check.py ----
-  // Renders the test view twice — with and without textures — and compares the pixels.
+  // Renders the test view twice  with and without textures  and compares the pixels.
   function evaluate() {
     var w = canvas.width, h = canvas.height;
     function capture(noTextures) {

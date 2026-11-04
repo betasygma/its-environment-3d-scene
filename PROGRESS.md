@@ -42,3 +42,4 @@
 - B7 (Excavator auto animation): looping work cycle (drive forward, pause, slew 90 deg, pause, slew back, drive back), auto/manual toggle on WASD/QE or Space, on-screen mode label, 19 tests passing, check_all 13/13 OK.
 - B6 (Camera presets): ~~claimed done~~ REOPENED on review: presets exist only as config + docs, no code reads them; keys do nothing. See BACKLOG B6.
 - B2 (Object relationship tree): tools/scene_tree.js generated docs/scene_tree.svg from live scene graph with joint classifications, 24 unit tests verifying all nodes present, check_all 14/14 OK.
+- B6 (Camera presets): src/camera.js pure module, presets 1-4 lookup, excavator follow camera (heading 0 and 90 deg), main.js integration with ?preset=N parameter, 25 tests in tests/camera.test.js passing, check_all green.

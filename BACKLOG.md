@@ -36,7 +36,7 @@ Files: `src/world.js` only.
 Done when: `tests/excavator.test.js` still passes; add tests for the cycle (positions at given times, slew limits
 respected, seamless loop: state at t = period equals t = 0).
 
-### B6 — Camera presets · Sonnet · todo (reopened 2026-11-04)
+### B6 — Camera presets · Sonnet · done
 **Reopened:** it was marked done, but only the preset values (`SCENE_CONFIG.cameraPresets` in index.html) and
 `docs/CAMERA.md` exist — no code reads them, so keys 1–4 and F do nothing. The `shot_preset*.png` files were made with
 `render_check.py --cam`, not by the feature. Keep the existing preset values and docs; implement the behaviour.
