@@ -55,52 +55,62 @@ def tessellate_part(part):
     """Return (pos Nx3, nrm Nx3, uv Nx2, idx Mx3) in the GL frame."""
     tol = part.get("tol", DEFAULT_TOL)
     uv_scale = part.get("uv_scale", 1.0)
+    uv_mode = part.get("uv_mode", "box")
     shape = as_shape(part["shape"])
     # Mesh the whole shape once so neighbouring faces share identical edge points
     # (meshing faces one by one leaves T-junction cracks on curved edges).
     BRepMesh_IncrementalMesh(shape.wrapped, tol, True, DEFAULT_ANG, True)
+
     P, N, T = [], [], []
+    solid_indices = []
     base = 0
-    for face in shape.Faces():
-        verts, tris = face.tessellate(tol, DEFAULT_ANG)
-        if not verts or not tris:
-            continue
-        # Per-vertex exact surface normal (CQ's normalAt respects face orientation).
-        cq_n = []
-        for v in verts:
-            try:
-                n = face.normalAt(cq.Vector(v.x, v.y, v.z))
-                n = (n.x, n.y, n.z)
-                ok = np.linalg.norm(n) > 1e-9 and all(np.isfinite(n))
-            except Exception:
-                ok = False
-            cq_n.append(n if ok else None)
-        pos = np.array([to_gl((v.x, v.y, v.z)) for v in verts], dtype=np.float64)
-        nrm = np.array([to_gl(n) if n is not None else (0, 0, 0) for n in cq_n], dtype=np.float64)
-        have = np.array([n is not None for n in cq_n])
-        tri = np.array(tris, dtype=np.int64)
 
-        # Make winding agree with the outward normals; flip the whole face if not.
-        if have.any():
-            gn = np.cross(pos[tri[:, 1]] - pos[tri[:, 0]], pos[tri[:, 2]] - pos[tri[:, 0]])
-            mean_n = nrm[tri].sum(axis=1)       # missing normals are zero, so they add nothing
-            if np.einsum("ij,ij->i", gn, mean_n).sum() < 0:
-                tri = tri[:, [0, 2, 1]]
+    solids = shape.Solids()
+    if not solids:
+        solids = [shape]
 
-        # Fallback: average adjacent triangle normals (within this face).
-        if not have.all():
-            gn = np.cross(pos[tri[:, 1]] - pos[tri[:, 0]], pos[tri[:, 2]] - pos[tri[:, 0]])
-            acc = np.zeros_like(pos)
-            for k in range(3):
-                np.add.at(acc, tri[:, k], gn)
-            nrm[~have] = acc[~have]
-        length = np.linalg.norm(nrm, axis=1, keepdims=True)
-        nrm = nrm / np.maximum(length, 1e-12)
+    for s_idx, solid in enumerate(solids):
+        for face in solid.Faces():
+            verts, tris = face.tessellate(tol, DEFAULT_ANG)
+            if not verts or not tris:
+                continue
+            # Per-vertex exact surface normal (CQ's normalAt respects face orientation).
+            cq_n = []
+            for v in verts:
+                try:
+                    n = face.normalAt(cq.Vector(v.x, v.y, v.z))
+                    n = (n.x, n.y, n.z)
+                    ok = np.linalg.norm(n) > 1e-9 and all(np.isfinite(n))
+                except Exception:
+                    ok = False
+                cq_n.append(n if ok else None)
+            pos = np.array([to_gl((v.x, v.y, v.z)) for v in verts], dtype=np.float64)
+            nrm = np.array([to_gl(n) if n is not None else (0, 0, 0) for n in cq_n], dtype=np.float64)
+            have = np.array([n is not None for n in cq_n])
+            tri = np.array(tris, dtype=np.int64)
 
-        P.append(pos)
-        N.append(nrm)
-        T.append(tri + base)
-        base += len(pos)
+            # Make winding agree with the outward normals; flip the whole face if not.
+            if have.any():
+                gn = np.cross(pos[tri[:, 1]] - pos[tri[:, 0]], pos[tri[:, 2]] - pos[tri[:, 0]])
+                mean_n = nrm[tri].sum(axis=1)       # missing normals are zero, so they add nothing
+                if np.einsum("ij,ij->i", gn, mean_n).sum() < 0:
+                    tri = tri[:, [0, 2, 1]]
+
+            # Fallback: average adjacent triangle normals (within this face).
+            if not have.all():
+                gn = np.cross(pos[tri[:, 1]] - pos[tri[:, 0]], pos[tri[:, 2]] - pos[tri[:, 0]])
+                acc = np.zeros_like(pos)
+                for k in range(3):
+                    np.add.at(acc, tri[:, k], gn)
+                nrm[~have] = acc[~have]
+            length = np.linalg.norm(nrm, axis=1, keepdims=True)
+            nrm = nrm / np.maximum(length, 1e-12)
+
+            P.append(pos)
+            N.append(nrm)
+            T.append(tri + base)
+            solid_indices.extend([s_idx] * len(pos))
+            base += len(pos)
 
     if not P:
         raise ValueError("tessellation produced no geometry")
@@ -110,15 +120,38 @@ def tessellate_part(part):
     if len(pos) > MAX_VERTS:
         raise ValueError("%d vertices exceeds the Uint16 limit of %d" % (len(pos), MAX_VERTS))
 
-    # Box-projection UVs from the dominant axis of the GL-frame normal.
-    a = np.abs(nrm)
-    ax = (a[:, 0] >= a[:, 1]) & (a[:, 0] >= a[:, 2])
-    ay = ~ax & (a[:, 1] >= a[:, 2])
-    uv = np.empty((len(pos), 2))
-    uv[:] = pos[:, [0, 1]]                       # |nz| largest -> (x, y)
-    uv[ax] = pos[ax][:, [2, 1]]                  # |nx| largest -> (z, y)
-    uv[ay] = pos[ay][:, [0, 2]]                  # |ny| largest -> (x, z)
-    uv *= uv_scale
+    if uv_mode == "fit":
+        solid_arr = np.array(solid_indices)
+        uv = np.empty((len(pos), 2))
+        for s_idx in range(len(solids)):
+            mask = (solid_arr == s_idx)
+            if not mask.any():
+                continue
+            s_pos = pos[mask]
+            lo = s_pos.min(axis=0)
+            hi = s_pos.max(axis=0)
+            sz = hi - lo
+            thin = int(np.argmin(sz))
+            if thin == 0:        # thin x -> (z, y)
+                u_ax, v_ax = 2, 1
+            elif thin == 2:      # thin z -> (x, y)
+                u_ax, v_ax = 0, 1
+            else:                # thin y -> (x, z)
+                u_ax, v_ax = 0, 2
+            u = (s_pos[:, u_ax] - lo[u_ax]) / max(sz[u_ax], 1e-6)
+            v = (s_pos[:, v_ax] - lo[v_ax]) / max(sz[v_ax], 1e-6)
+            uv[mask] = np.column_stack([u, v])
+    else:
+        # Box-projection UVs from the dominant axis of the GL-frame normal.
+        a = np.abs(nrm)
+        ax = (a[:, 0] >= a[:, 1]) & (a[:, 0] >= a[:, 2])
+        ay = ~ax & (a[:, 1] >= a[:, 2])
+        uv = np.empty((len(pos), 2))
+        uv[:] = pos[:, [0, 1]]                       # |nz| largest -> (x, y)
+        uv[ax] = pos[ax][:, [2, 1]]                  # |nx| largest -> (z, y)
+        uv[ay] = pos[ay][:, [0, 2]]                  # |ny| largest -> (x, z)
+        uv *= uv_scale
+
     return pos, nrm, uv, idx
 
 
@@ -169,6 +202,11 @@ def main():
             "vertexCount": int(len(pos)),
             "indexCount": int(idx.size),
         }
+        if p.get("alpha_cutoff") is not None:
+            entry["alphaCutoff"] = float(p["alpha_cutoff"])
+        if p.get("unlit"):
+            entry["unlit"] = True
+
         entry["position"] = len(buf)
         buf += pos.astype("<f4").tobytes()
         entry["normal"] = len(buf)

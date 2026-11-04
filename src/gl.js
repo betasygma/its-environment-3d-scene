@@ -1,4 +1,4 @@
-// gl.js — small WebGL 1 helpers: shaders, meshes, textures, model loading.
+// gl.js - small WebGL 1 helpers: shaders, meshes, textures, model loading.
 
 var GLX = {};
 
@@ -150,8 +150,11 @@ GLX.loadModel = function (gl, model) {
     node.color = GLX.hexToRgb(p.color || '#ffffff');
     node.texture = p.texture || null;
     if (node.texture) GLX.getTexture(gl, node.texture);
+    node.alphaCutoff = p.alphaCutoff || 0;
+    node.unlit = !!p.unlit;
     (p.parent ? byName[p.parent] : root).add(node);   // exporter guarantees parents come first
     byName[p.name] = node;
   });
   return root;
 };
+

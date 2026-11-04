@@ -15,5 +15,11 @@ check('fragment shader does not flip normals with gl_FrontFacing', SHADERS.litFS
   'remove the back-face normal flip; imported meshes have inconsistent winding');
 check('fragment shader normalises the interpolated normal', /normalize\(vNormal\)/.test(SHADERS.litFS));
 
+// B12a checks
+check('fragment shader contains discard guarded by uAlphaCutoff', /uAlphaCutoff.*discard|discard.*uAlphaCutoff/.test(SHADERS.litFS));
+check('fragment shader contains uUnlit early return', /uUnlit.*gl_FragColor.*return/.test(SHADERS.litFS));
+check('SHADERS.skyVS exists', typeof SHADERS.skyVS === 'string' && SHADERS.skyVS.length > 0);
+check('SHADERS.skyFS exists', typeof SHADERS.skyFS === 'string' && SHADERS.skyFS.length > 0);
+
 if (failures) { console.log('FAILED shading: ' + failures + '/' + total); process.exit(1); }
 console.log('OK shading: ' + total + ' tests');

@@ -1,10 +1,12 @@
-"""Headless render check: opens index.html?test from file:// in headless Chrome and prints
-the page's one-line self-check result (RENDER OK / RENDER FAIL ...).
+"""Headless render check: opens index.html?test (or --page PATH) from file:// in headless Chrome
+and prints the page's one-line self-check result (RENDER OK / RENDER FAIL ...).
 
 Usage:
-  python3 tools/render_check.py                 # self-check
+  python3 tools/render_check.py                 # self-check index.html
+  python3 tools/render_check.py --page tests/alpha_probe.html  # probe check
   python3 tools/render_check.py --shot out.png  # also save a screenshot of the normal view
   python3 tools/render_check.py --shot out.png --cam 0,0.15,14   # screenshot from yaw,pitch,distance
+  python3 tools/render_check.py --shot out.png --preset 1        # screenshot from preset 1-4
 
 Chrome is found via $CHROME or the usual names. Software rendering (SwiftShader) is used so it
 works without a GPU.
@@ -46,7 +48,11 @@ def find_chrome():
 
 def main():
     chrome = find_chrome()
-    page = (ROOT / "index.html").as_uri()
+    rel_page = "index.html"
+    if "--page" in sys.argv:
+        rel_page = sys.argv[sys.argv.index("--page") + 1]
+    page = (ROOT / rel_page).resolve().as_uri()
+
     out = subprocess.run([chrome, *FLAGS, "--dump-dom", page + "?test"],
                          capture_output=True, text=True, timeout=120).stdout
     m = re.search(r'<pre id="status">([^<]*)</pre>', out)
@@ -56,7 +62,8 @@ def main():
     if "--shot" in sys.argv:
         dest = pathlib.Path(sys.argv[sys.argv.index("--shot") + 1]).resolve()
         cam = "&cam=" + sys.argv[sys.argv.index("--cam") + 1] if "--cam" in sys.argv else ""
-        subprocess.run([chrome, *FLAGS, "--window-size=1280,800", f"--screenshot={dest}", page + "?shot" + cam],
+        preset = "&preset=" + sys.argv[sys.argv.index("--preset") + 1] if "--preset" in sys.argv else ""
+        subprocess.run([chrome, *FLAGS, "--window-size=1280,800", f"--screenshot={dest}", page + "?shot" + cam + preset],
                        capture_output=True, timeout=120)
         print(f"SHOT {'OK' if dest.exists() else 'FAIL'} {dest}")
 

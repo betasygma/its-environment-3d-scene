@@ -65,16 +65,29 @@ def facade(size=256):
     return img
 
 
+def probe_half(size=64):
+    """Alpha probe texture: left half opaque white, right half fully transparent."""
+    img = Image.new("RGBA", (size, size), (255, 255, 255, 255))
+    px = img.load()
+    half = size // 2
+    for y in range(size):
+        for x in range(half, size):
+            px[x, y] = (255, 255, 255, 0)
+    return img
+
+
 TEXTURES = {
     "checker": checker,
     "gravel": gravel,
     "facade": facade,
+    "probe_half": probe_half,
 }
 
 
 def to_data_uri(img):
     buf = io.BytesIO()
-    img.save(buf, format="PNG", optimize=True)
+    fmt = "PNG"
+    img.save(buf, format=fmt, optimize=True)
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
 
 

@@ -1,4 +1,4 @@
-// main.js  sets up WebGL, builds the scene from window.MODELS, runs the render loop.
+// main.js - sets up WebGL, builds the scene from window.MODELS, runs the render loop.
 // Modes (from the URL query string):
 //   (none)  interactive: drag to orbit, wheel to zoom
 //   ?test   headless self-check: renders from SCENE_CONFIG.testCamera, writes a one-line result
@@ -23,6 +23,16 @@
     if (!gl) throw new Error('WebGL not available');
     GLX.init(gl);
     prog = GLX.createProgram(gl, SHADERS.litVS, SHADERS.litFS);
+    var skyProg = null, skyQuadBuf = null;
+    if (SHADERS.skyVS && SHADERS.skyFS) {
+      skyProg = GLX.createProgram(gl, SHADERS.skyVS, SHADERS.skyFS);
+      skyQuadBuf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, skyQuadBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1,  1, -1, -1,  1,
+        -1,  1,  1, -1,  1,  1
+      ]), gl.STATIC_DRAW);
+    }
 
     // The whole scene hangs under one root node; each model is a subtree.
     // src/world.js decides where each model goes and how things move.
@@ -54,7 +64,7 @@
     }
   }
 
-  // Optional ?cam=yaw,pitch,distance (radians, metres)  used for screenshots from a chosen angle.
+  // Optional ?cam=yaw,pitch,distance (radians, metres) - used for screenshots from a chosen angle.
   var camParam = /[?&]cam=([-\d.]+),([-\d.]+),([-\d.]+)/.exec(location.search);
   if (camParam) { cam.yaw = +camParam[1]; cam.pitch = +camParam[2]; cam.distance = +camParam[3]; }
 
@@ -140,6 +150,32 @@
     }
     var proj = Mat4.perspective(Math.PI / 4, canvas.width / canvas.height, 0.1, 200);
 
+    // Draw sky before scene (skipped in test mode)
+    if (mode !== 'test' && skyProg && skyQuadBuf) {
+      gl.disable(gl.DEPTH_TEST);
+      gl.depthMask(false);
+      gl.useProgram(skyProg);
+      var su = skyProg.uniforms;
+      var invVP = Mat4.invert(Mat4.mul(proj, view));
+      if (invVP) gl.uniformMatrix4fv(su.uInvViewProj, false, invVP);
+      gl.uniform3fv(su.uCameraPos, eye);
+      var horiz = light.skyHorizon || [0.93, 0.80, 0.72];
+      var zen = light.skyZenith || [0.60, 0.66, 0.76];
+      gl.uniform3fv(su.uHorizon, horiz);
+      gl.uniform3fv(su.uZenith, zen);
+      gl.uniform3fv(su.uSunDir, Vec3.normalize(light.sunDir));
+      gl.uniform3fv(su.uSunColor, light.sunColor);
+
+      var aLoc = skyProg.attribs.aPos;
+      gl.bindBuffer(gl.ARRAY_BUFFER, skyQuadBuf);
+      gl.enableVertexAttribArray(aLoc);
+      gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      gl.depthMask(true);
+      gl.enable(gl.DEPTH_TEST);
+    }
+
     gl.useProgram(prog);
     var u = prog.uniforms;
     gl.uniformMatrix4fv(u.uView, false, view);
@@ -162,6 +198,8 @@
       gl.uniform3fv(u.uBaseColor, node.color);
       gl.uniform1f(u.uShininess, 24.0);
       gl.uniform1f(u.uSpecular, 0.25);
+      if (u.uAlphaCutoff) gl.uniform1f(u.uAlphaCutoff, node.alphaCutoff || 0.0);
+      if (u.uUnlit) gl.uniform1f(u.uUnlit, node.unlit ? 1.0 : 0.0);
       if (node.texture && !noTextures) {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, GLX.getTexture(gl, node.texture));
@@ -174,7 +212,7 @@
   }
 
   // ---- self-check used by tools/render_check.py ----
-  // Renders the test view twice  with and without textures  and compares the pixels.
+  // Renders the test view twice - with and without textures - and compares the pixels.
   function evaluate() {
     var w = canvas.width, h = canvas.height;
     function capture(noTextures) {
@@ -198,7 +236,13 @@
     var t = cfg.test, problems = [];
     if (err !== gl.NO_ERROR) problems.push('glError=' + err);
     if (GLX.textureProblems.length) problems.push('textures[' + GLX.textureProblems.join(',') + ']');
-    if (drawnFrac < t.minDrawn) problems.push('drawn=' + drawnFrac.toFixed(3) + '<' + t.minDrawn);
+    if (t.drawnRange) {
+      if (drawnFrac < t.drawnRange[0] || drawnFrac > t.drawnRange[1]) {
+        problems.push('drawn=' + drawnFrac.toFixed(3) + ' not in [' + t.drawnRange[0] + ',' + t.drawnRange[1] + ']');
+      }
+    } else if (t.minDrawn && drawnFrac < t.minDrawn) {
+      problems.push('drawn=' + drawnFrac.toFixed(3) + '<' + t.minDrawn);
+    }
     if (t.minTextureEffect && texFrac < t.minTextureEffect) problems.push('textureNotVisible=' + texFrac.toFixed(2) + '<' + t.minTextureEffect);
     setStatus((problems.length ? 'RENDER FAIL ' + problems.join(' ') : 'RENDER OK') +
       ' drawn=' + drawnFrac.toFixed(3) + ' textureEffect=' + texFrac.toFixed(2) + ' textures=' + Object.keys(GLX.textures).length);
@@ -223,3 +267,4 @@
   }
   requestAnimationFrame(frame);
 })();
+

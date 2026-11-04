@@ -1,4 +1,4 @@
-// camera.js  pure camera calculations for orbit presets and follow camera.
+// camera.js - pure camera calculations for orbit presets and follow camera.
 // No DOM or WebGL dependencies so it can be tested in Node.js.
 
 var CAMERA = (function () {

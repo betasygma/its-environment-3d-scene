@@ -78,7 +78,9 @@ change it live. Plus 10 likely "challenge" requests (e.g. change light colour, a
 faster, add a child object, rotate the cab) with the minimal edit for each.
 Done when: the human has walked through it once with the agent.
 
-### B12a / B12b / B12c / B13 — Make the site look like the real place · Sonnet · todo
+### B12a — Engine features for cut-outs, photo backdrops and sky · Sonnet · done
+
+### B12b / B12c / B13 — Make the site look like the real place · Sonnet · todo
 Full spec in **`docs/HANDOFF_SITE.md`** (read it before starting any of these). Summary:
 - **B12a** engine features: alpha cut-outs, unlit photo panels, "fit" UVs, dusk sky; proven by an alpha probe page.
 - **B12b** `tools/photo_textures.py`: tileable textures cut from the team's photos (crops pre-verified in

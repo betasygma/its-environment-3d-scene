@@ -43,3 +43,4 @@
 - B6 (Camera presets): ~~claimed done~~ REOPENED on review: presets exist only as config + docs, no code reads them; keys do nothing. See BACKLOG B6.
 - B2 (Object relationship tree): tools/scene_tree.js generated docs/scene_tree.svg from live scene graph with joint classifications, 24 unit tests verifying all nodes present, check_all 14/14 OK.
 - B6 (Camera presets): src/camera.js pure module, presets 1-4 lookup, excavator follow camera (heading 0 and 90 deg), main.js integration with ?preset=N parameter, 25 tests in tests/camera.test.js passing, check_all green.
+- B12a (Engine features for cut-outs, photo backdrops, sky): tools/export.py fit UVs, alphaCutoff, unlit; src/gl.js loader; src/shaders.js discard & sky; src/main.js full-screen sky pass & drawnRange; builders/probe_card.py & tests/alpha_probe.html with positive & negative proofs; check_all passes.

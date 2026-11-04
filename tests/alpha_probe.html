@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Alpha Probe Check</title>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <pre id="status">loading...</pre>
+
+  <script>
+    // Test camera looks straight at the 2m x 2m card so it fills ~50% of the 256x256 view.
+    // Card is at [0, 0, 0] with width=2, height=2.
+    // At z=2.4m, FOV=45 deg, view height at target is 2 * tan(22.5 deg) * 2.4 ~= 1.98m (~100% of view)
+    // At z=2.8m, card fills ~50% of total pixel area.
+    // With alphaCutoff=0.5 and probe_half, left half is drawn (~25% of view), right half is discarded!
+    // If discard works: drawn is ~0.25 (drawnRange: [0.15, 0.35]).
+    // If discard is broken: drawn would be ~0.50 (drawnRange fails!).
+    var SCENE_CONFIG = {
+      models: ['probe_card'],
+      camera: { target: [0, 0, 0], distance: 3.414, yaw: 0, pitch: 0 },
+      testCamera: { eye: [0, 0, 3.414], target: [0, 0, 0], up: [0, 1, 0] },
+      test: { drawnRange: [0.15, 0.35], minTextureEffect: 0.0 },
+      light: {
+        sunDir: [0, 0, 1],
+        sunColor: [1, 1, 1],
+        skyColor: [0.5, 0.5, 0.5],
+        groundColor: [0.5, 0.5, 0.5]
+      }
+    };
+  </script>
+  <script src="../src/math.js"></script>
+  <script src="../src/scene.js"></script>
+  <script src="../src/gl.js"></script>
+  <script src="../src/shaders.js"></script>
+  <script src="../assets/textures.js"></script>
+  <script src="../assets/models/probe_card.js"></script>
+  <script>
+    var WORLD = {
+      build: function (world, models) {
+        if (models.probe_card) world.add(models.probe_card);
+      },
+      update: function () {}
+    };
+  </script>
+  <script src="../src/main.js"></script>
+</body>
+</html>
