@@ -41,7 +41,9 @@ An animated WebGL 3D scene recreating selected objects and locations within the 
 
 ## Overview
 
-This project recreates selected objects from the ITS campus (excluding the Informatics Engineering Department) as an animated 3D scene using WebGL. The selected location is **TODO: Location name**, chosen because **TODO: one-sentence rationale, e.g. distinctive structures and clear reference material**.
+This project recreates a temporary construction area inside the ITS campus (outside the Informatics Engineering Department) as an animated 3D scene using WebGL. The selected location is the construction zone near the ITS Main Gate and ITS Student Dormitory, chosen because it is an active construction site with a distinctive, articulated machine (a crawler excavator) that is well suited to hierarchical modelling, and because it is clearly photographable and filmable from several angles.
+
+> **Note on scope:** the scene is based on a temporary construction site. Its contents reflect the conditions on the day the reference photos and videos were taken (3 November 2026).
 
 The original assignment brief is in [`docs/ASSIGNMENT.md`](docs/ASSIGNMENT.md).
 
@@ -96,18 +98,43 @@ By completing this project, the group demonstrates the ability to:
 
 ## Scene and Objects
 
-**Location:** TODO: Location name  
-**Description:** TODO: Brief description of the area and its main characteristics.
+**Location:** Construction Zone near ITS Main Gate and ITS Student Dormitory, along Jl. Teknik Elektro, Keputih, Sukolilo, Surabaya, East Java, Indonesia.  
+**Description:** A temporary construction area with a distinctive crawler excavator and other construction equipment.
 
 ### Object List
 
 | No. | Object | Key Components | Texture / Material | Status |
 |---|---|---|---|---|
-| 1 | TODO | TODO: e.g. base, 4 pillars, roof | TODO | Planned |
-| 2 | TODO | TODO | TODO | Planned |
-| 3 | TODO | TODO | TODO | Planned |
-
+| 1 | Crawler excavator (Zoomlion ZE215E) | Undercarriage (2 tracks), upper structure, counterweight, engine hood, cab, boom, arm, bucket, 4 hydraulic cylinders, bucket linkage | Dull grey-black metal, lime-green paint (arm), decals (ZOOMLION, SN, boom number) | Must | Planned |
+| 2 | Ground | Plane with white limestone/gravel surface | Tiled limestone texture | Must | Planned |
+| 3 | Blue drum | Cylinder, top rim | Blue metal, label decal | Should | Planned |
+| 4 | Soil and rock piles | Cone/low-poly mesh, several rock instances | Soil texture, limestone texture | Should | Planned |
+| 5 | Road roller | Body, front drum, rear wheels, cab frame | Yellow paint, dark metal | Optional | Planned |
+| 6 | Trees | Cylinder trunk, canopy | Bark texture, leaf colour | Optional | Planned |
+    
 *Status values: Planned / In Progress / Done.*
+
+### Modelling Scope
+
+**Included:** objects 1–4 (core), objects 5–6 only after the excavator is finished.
+
+**Intentionally excluded:** background buildings, drainage ditch, puddles, litter, dry leaves, power lines, distant vehicles and motorcycles. These do not materially change recognisability and are represented by the sky colour and background only.
+
+### Reference Dimensions (Zoomlion ZE215E)
+
+Source: manufacturer specification. Values are transport dimensions.  
+Scale unit: **1.0 = track length on ground (3380 mm)**.
+
+| Dimension | mm | Scene units |
+|---|---|---|
+| Overall length (transport) | 9670 | 2.861 |
+| Overall width | 2800 | 0.828 |
+| Overall height (transport) | 3085 | 0.913 |
+| Tail slewing radius | 2945 | 0.871 |
+| Track gauge | 2200 | 0.651 |
+| Length of track on ground | 3380 | 1.000 |
+
+Boom length, arm length, bucket length, and cylinder anchor points are **not** in the specification. They are measured from the reference photographs (primarily the right-side view) as ratios to the track length, and recorded as estimates.
 
 ### Reference Photographs
 
@@ -115,8 +142,10 @@ By completing this project, the group demonstrates the ability to:
 
 | Object / Location | Reference Image | Source / Date |
 |---|---|---|
-| TODO | `assets/reference-images/TODO.jpg` | TODO |
-| TODO | `assets/reference-images/TODO.jpg` | TODO |
+| Excavator | [Front](assets/reference-images/excavator-front.jpg) | Own photo, 3 Nov 2026 |
+| Excavator | [Front-right](assets/reference-images/excavator-front-right.jpg) | Own photo, 3 Nov 2026 |
+| Excavator | [Right](assets/reference-images/excavator-right.jpg) | Own photo, 3 Nov 2026 |
+| Excavator | [Rear-right](assets/reference-images/excavator-rear-right.jpg) | Own photo, 3 Nov 2026 |
 
 ### Reference Videos
 
@@ -126,10 +155,16 @@ By completing this project, the group demonstrates the ability to:
 
 | Object | Animation Type | Transformation | Behaviour |
 |---|---|---|---|
-| TODO | TODO: e.g. rotation | TODO: e.g. rotate Y, 30°/s | TODO: e.g. continuous loop |
-| TODO | TODO | TODO | TODO |
+| Excavator upper structure | Swing | Rotate Y | Rotates toward the dig point and back |
+| Boom | Lift/lower | Rotate X at boom pivot | Lowers to the ground and raises |
+| Arm | Curl in/out | Rotate X at arm pivot | Pulls toward the cab while digging |
+| Bucket | Scoop/dump | Rotate X at bucket pivot | Scrapes, curls up, then dumps |
+| Hydraulic cylinders | Extend/retract | Barrel and rod stay aligned between two anchor points | Follows the joint it drives |
+| Camera (optional) | Orbit | TODO | TODO |
 
-**Animation Method:** TODO: describe the render loop (e.g. `requestAnimationFrame`), how delta time is computed, and how animation state feeds the transformations.
+**Dig cycle (one loop):** swing to dig point → boom down → arm curl in → bucket scoop → boom up → swing to dump point → bucket dump → swing back.
+
+**Animation Method:** TODO: describe the render loop, delta time, and how animation state feeds the transformations.
 
 ## Implementation
 
@@ -176,19 +211,70 @@ TODO: List textures, their sources/licences, and how UV coordinates map them to 
 
 ## Hierarchical Modelling
 
-Child objects inherit the transformations of their parents: moving, rotating, or scaling a parent applies to all of its descendants, while each child keeps its own local transformation.
+Child objects inherit the transformations of their parents. Each articulated joint is a **pivot node** whose origin sits at the physical joint, so rotating it moves every descendant around the correct point.
 
 ```mermaid
 graph TD
-    A[Scene Root] --> B[Parent Object 1]
-    A --> C[Parent Object 2]
-    B --> D[Child Object 1]
-    B --> E[Child Object 2]
-    C --> F[Child Object 3]
-    C --> G[Child Object 4]
+    Scene[Scene Root] --> Camera
+    Scene --> Lighting
+    Scene --> Ground
+    Scene --> Drum[Blue Drum]
+    Scene --> Roller[Road Roller - optional]
+    Scene --> Trees[Trees - optional]
+    Scene --> Exc[Excavator Root]
+
+    Lighting --> Dir[Directional Light - low sun]
+    Lighting --> Amb[Ambient Light]
+
+    Ground --> Mound[Soil Mound]
+    Ground --> Rocks[Rock Instances]
+
+    Roller --> RBody[Body]
+    Roller --> RDrum[Front Drum]
+    Roller --> RWheels[Rear Wheels]
+
+    Exc --> Under[Undercarriage]
+    Exc --> Swing[Swing Pivot - rotate Y]
+
+    Under --> TrackFrame[Track Frame]
+    Under --> LTrack[Left Track]
+    Under --> RTrack[Right Track]
+
+    Swing --> CW[Counterweight + Decal]
+    Swing --> Hood[Engine Hood]
+    Swing --> Cover[Side Cover]
+    Swing --> Cab[Cab: frame, glass, door]
+    Swing --> BoomPivot[Boom Pivot - rotate X]
+
+    BoomPivot --> Boom[Boom + Decals]
+    BoomPivot --> BoomCylL[Boom Cylinder L]
+    BoomPivot --> BoomCylR[Boom Cylinder R]
+    BoomPivot --> ArmPivot[Arm Pivot - rotate X]
+
+    ArmPivot --> Arm[Arm]
+    ArmPivot --> ArmCyl[Arm Cylinder]
+    ArmPivot --> BucketPivot[Bucket Pivot - rotate X]
+
+    BucketPivot --> Bucket[Bucket + Teeth]
+    BucketPivot --> BucketCyl[Bucket Cylinder]
+    BucketPivot --> Link[Bucket Linkage: 2 links]
 ```
 
-TODO: Explain how the hierarchy is implemented (e.g. a matrix stack or scene-graph nodes) and give one concrete example, such as which transformation propagates to which child.
+### Node Naming Contract
+
+Node names used in the diagram and in the code must match. Any change must be updated in both places.
+
+| Diagram node | Code identifier | Local transform |
+|---|---|---|
+| Excavator Root | `excavator` | translate + yaw of the whole machine |
+| Swing Pivot | `swing` | rotate Y |
+| Boom Pivot | `boomPivot` | rotate X |
+| Arm Pivot | `armPivot` | rotate X |
+| Bucket Pivot | `bucketPivot` | rotate X |
+
+**Cylinders:** a cylinder needs two parts (barrel on the parent, rod on the moving part). Barrel and rod are re-oriented each frame between two anchor points, so the rod extends and retracts instead of rotating rigidly with the boom. If time is short, a single scaled and rotated cylinder is the fallback.
+
+TODO: explain the actual implementation (matrix stack or scene-graph nodes) and one concrete propagation example.
 
 ## Visual Documentation
 
@@ -212,8 +298,8 @@ TODO: Explain how the hierarchy is implemented (e.g. a matrix stack or scene-gra
 
 | Member | SID | Modules / Objects Owned | Details |
 |---|---|---|---|
-| Mikail Ibrahim Hakim | 5025241046 | TODO | TODO |
-| Bara Semangat Rohmani | 5025241144 | TODO | TODO |
+| Mikail Ibrahim Hakim | 5025241046 | Implementation | Geometry and modelling, hierarchy, animation, lighting, textures, camera, integration, main application page |
+| Bara Semangat Rohmani | 5025241144 | Documentation, references, design specification | Repository, README and docs; reference photos and videos; object selection and scope; hierarchy tree and animation design; measuring proportions from photos; verifying the model against references |
 
 Both members are able to explain the full implementation, not only their own modules.
 
@@ -267,9 +353,11 @@ TODO: Add any project-specific setup notes (browser tested, known compatibility 
 
 ## Limitations
 
-- TODO: Modelling simplifications compared with the real objects.
-- TODO: Differences between the real environment and the implementation.
-- TODO: Technical limitations or incomplete features.
+- The excavator is built from primitives and custom meshes, so fine details (hoses, bolts, grilles) are simplified or omitted.
+- Boom, arm, and cylinder proportions are estimated from photographs; some parts are partly occluded by trees in the photos.
+- Only the excavator has articulated animation; other objects are static unless time allows.
+- The real site is temporary and changes over time; the scene reflects one day's conditions.
+- TODO: technical limitations after implementation.
 
 ## References
 
