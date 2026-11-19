@@ -1,22 +1,20 @@
 # ITS Environment 3D Scene
 
-An animated WebGL 3D scene recreating selected objects and locations within the Institut Teknologi Sepuluh Nopember (ITS) campus, outside the Informatics Engineering Department. It demonstrates 3D transformations, camera, lighting, texture mapping, and hierarchical modelling.
+An animated WebGL scene of a road construction site near the Institut Teknologi Sepuluh Nopember (ITS) campus. The scene focuses on a Zoomlion excavator and includes a road roller, drums, gravel and dirt piles, trees, a building backdrop, and ground. It demonstrates transformations, camera control, lighting, texture mapping, hierarchical modelling, and animation.
 
-[![WebGL 2](https://img.shields.io/badge/WebGL-2.0-blue?logo=webgl)](https://www.khronos.org/webgl/)
+[![WebGL 1](https://img.shields.io/badge/WebGL-1.0-blue?logo=webgl)](https://www.khronos.org/webgl/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![HTML5](https://img.shields.io/badge/HTML5-Canvas-orange?logo=html5)](https://developer.mozilla.org/en-US/docs/Web/HTML)
-[![CSS3](https://img.shields.io/badge/CSS3-Layout-blue?logo=css3)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 
 | | |
 |---|---|
-| **Group** | TODO: Group name |
+| **Group** | Zoomlion |
 | **Course** | Computer Graphics — Assignment 2 |
 | **Semester / Year** | Semester 5, Academic Year 2026/2027 |
 | **Institution** | Institut Teknologi Sepuluh Nopember (ITS), Surabaya, Indonesia |
 | **Members** | Mikail Ibrahim Hakim (5025241046), Bara Semangat Rohmani (5025241144) |
-| **Location** | TODO: Location name |
-| **Status** | In Development |
-| **Live Demo** | TODO: URL (e.g. GitHub Pages), or "Run locally — see [Running the Project](#running-the-project)" |
+| **Location** | Construction Zone near ITS Main Gate and ITS Student Dormitory, along Jl. Teknik Elektro, Keputih, Sukolilo, Surabaya, East Java, Indonesia |
+| **Status** | Core scene implemented; submission page and site-fidelity work remain in progress |
 
 ---
 
@@ -25,6 +23,7 @@ An animated WebGL 3D scene recreating selected objects and locations within the 
 - [Overview](#overview)
 - [Objectives](#objectives)
 - [Assignment Compliance](#assignment-compliance)
+- [Assessment Criteria](#assessment-criteria)
 - [Features](#features)
 - [Scene and Objects](#scene-and-objects)
 - [Animation](#animation)
@@ -41,130 +40,125 @@ An animated WebGL 3D scene recreating selected objects and locations within the 
 
 ## Overview
 
-This project recreates a temporary construction area inside the ITS campus (outside the Informatics Engineering Department) as an animated 3D scene using WebGL. The selected location is the construction zone near the ITS Main Gate and ITS Student Dormitory, chosen because it is an active construction site with a distinctive, articulated machine (a crawler excavator) that is well suited to hierarchical modelling, and because it is clearly photographable and filmable from several angles.
+This project recreates a temporary construction area near the ITS Main Gate and student dormitory. The scene is built with raw WebGL 1 and JavaScript, and can be opened directly from `index.html`. The excavator, road roller, ground, and site props are assembled from generated model assets and a scene graph.
 
-> **Note on scope:** the scene is based on a temporary construction site. Its contents reflect the conditions on the day the reference photos and videos were taken (3 November 2026).
+The project is being developed for the WebGL graphics assignment. Its current application page is a full-screen canvas; the assignment's photo/video comparison layout, group task information, and embedded hierarchy diagram have not yet been added to the page.
 
-The original assignment brief is in [`docs/ASSIGNMENT.md`](docs/ASSIGNMENT.md).
+The assignment brief and project-specific setup are documented in [`docs/BRIEF.md`](docs/BRIEF.md) and [`SETUP.md`](SETUP.md).
 
 ## Objectives
 
-By completing this project, the group demonstrates the ability to:
+The project demonstrates the ability to:
 
-- Recreate real campus objects as a recognisable 3D scene.
-- Apply translation, rotation, and scaling, and work with coordinate systems.
-- Configure the camera and projection for scene viewing.
-- Apply lighting and texture mapping to improve visual fidelity.
-- Use hierarchical modelling to define parent-child relationships between objects.
-- Develop time-based animation for selected objects.
+- Recreate recognizable objects and a location from the ITS environment.
+- Apply translation, rotation, scaling, and coordinate-system conversions.
+- Configure and control a perspective camera.
+- Apply lighting and texture mapping.
+- Organize moving and static objects with a scene graph.
+- Animate the excavator and road roller over time.
 
 ## Assignment Compliance
 
-**Main application page requirements** (all must be present in `index.html`, not only in this README):
+The following are requirements for the **main application page**. A description or image in this README does not count as an item being present in `index.html`.
 
-| Requirement | Location | Status |
+| Requirement | Current implementation | Status |
 |---|---|---|
-| Group name | Page header | ☐ |
-| Photographs of actual objects | [Reference Photographs](#reference-photographs) | ☐ |
-| Videos of actual objects | [Reference Videos](#reference-videos) | ☐ |
-| Canvas placed near reference images | [Comparison](#comparison-with-the-real-environment) | ☐ |
-| Hierarchy tree diagram | [Hierarchical Modelling](#hierarchical-modelling) | ☐ |
-| Task distribution | [Task Distribution](#task-distribution) | ☐ |
-| Implemented with WebGL | [Technologies](#technologies) | ☐ |
+| Group name | Confirmed as Zoomlion; not yet shown on the application page | Incomplete |
+| Photographs of actual objects | Reference photos are in [`assets/reference-images/`](assets/reference-images/) and [`scene/`](scene/); not shown on the page | Incomplete |
+| Video of actual objects | No video has been provided yet | Missing |
+| Canvas beside reference images | The current page contains a full-screen canvas only | Incomplete |
+| Hierarchy tree diagram | Generated diagram is available at [`docs/scene_tree.svg`](docs/scene_tree.svg); not embedded on the page | Partial |
+| Task distribution | Documented in this README; not shown on the page | Incomplete |
+| WebGL implementation | The application uses WebGL 1 | Implemented |
 
-**Assessment criteria coverage:**
+The complete assignment checklist is in [`docs/BRIEF.md`](docs/BRIEF.md).
 
-| Criterion | Where addressed |
-|---|---|
-| Complexity | [Object List](#object-list) (key components per object) |
-| Similarity to real objects | [Comparison](#comparison-with-the-real-environment) |
-| Task distribution | [Task Distribution](#task-distribution) |
-| Lighting and texture | [Lighting](#lighting), [Textures](#textures) |
-| Ability to explain implementation | [Implementation](#implementation), [Hierarchical Modelling](#hierarchical-modelling) |
-| Ability to solve challenges | [Technical Challenges](#technical-challenges) |
+## Assessment Criteria
+
+The assignment also grades complexity, similarity, task distribution, lighting and texture, ability to explain the implementation, and ability to solve challenges. The table below distinguishes what the repository already demonstrates from what still needs human review or presentation.
+
+| Criterion | Evidence available in this repository | Status / next step |
+|---|---|---|
+| Complexity | Excavator, roller, ground, and props are in the scene; the generated scene tree and model tests document their hierarchy and moving parts. | Implemented; present the tree and explain the moving parts. |
+| Similarity to the real environment | Four excavator reference views are in `assets/reference-images/`; the site photos are in `scene/`. The scene also includes a roller, drums, piles, trees, and a building. | Partial; compare the render beside the photos and address the low-fidelity site objects and ground. |
+| Task distribution | Member responsibilities are listed in [Task Distribution](#task-distribution). | Documented here; still needs to be added to the main application page. |
+| Lighting and texture | The app uses Blinn-Phong lighting, an imported excavator colour map, and generated textures. | Basic implementation is present; visual polish and a clear photo comparison remain. |
+| Explain the implementation | This README describes transformations, camera, lighting, textures, animation, and hierarchy. The interfaces are documented in [`ENGINE_API.md`](ENGINE_API.md). | Partially prepared; explain the implementation aloud and verify that both members can do so. |
+| Solve challenges | The challenge practice list below points to existing configuration, scene, and asset-building code. | Practice prompts are prepared; the team still needs to rehearse and demonstrate changes live. |
+
+### Quick Wins from Existing Repository Content
+
+These items can be documented now from files already present. They improve the project record, but do **not** satisfy the corresponding main-page requirement until added to `index.html`.
+
+- Group name and location are confirmed above.
+- Reference photos can be linked from `assets/reference-images/` and `scene/`.
+- The live hierarchy diagram already exists at [`docs/scene_tree.svg`](docs/scene_tree.svg).
+- Controls and member responsibilities are described in this README.
+- The main implementation concepts and their code entry points are summarized below.
 
 ## Features
 
-<!-- Tick each item only after it is implemented and verified in the running application. -->
-
-- [ ] 3D scene representing the selected ITS location
-- [ ] Custom 3D object modelling
-- [ ] Translation, rotation, and scaling
-- [ ] Camera configuration and user control
-- [ ] Lighting
-- [ ] Texture mapping
-- [ ] Hierarchical modelling
-- [ ] Object animation
+- [x] 3D scene representing the selected ITS construction site
+- [x] Excavator, road roller, ground, drums, piles, trees, and building backdrop
+- [x] Translation, rotation, scaling, and scene-graph hierarchy
+- [x] Orbit camera, four camera presets, and excavator follow camera
+- [x] Blinn-Phong lighting with ambient and directional components
+- [x] Embedded texture assets and generated textures
+- [x] Excavator and road roller animation
+- [ ] Submission page with reference photos, video, task split, and hierarchy diagram
+- [ ] Final site likeness and photo-based ground/backdrop work
 
 ## Scene and Objects
 
-**Location:** Construction Zone near ITS Main Gate and ITS Student Dormitory, along Jl. Teknik Elektro, Keputih, Sukolilo, Surabaya, East Java, Indonesia.  
-**Description:** A temporary construction area with a distinctive crawler excavator and other construction equipment.
+**Location:** Construction Zone near ITS Main Gate and ITS Student Dormitory, along Jl. Teknik Elektro, Keputih, Sukolilo, Surabaya, East Java, Indonesia.
 
 ### Object List
 
-| No. | Object | Key Components | Texture / Material | Status |
-|---|---|---|---|---|
-| 1 | Crawler excavator (Zoomlion ZE215E) | Undercarriage (2 tracks), upper structure, counterweight, engine hood, cab, boom, arm, bucket, 4 hydraulic cylinders, bucket linkage | Dull grey-black metal, lime-green paint (arm), decals (ZOOMLION, SN, boom number) | Must | Planned |
-| 2 | Ground | Plane with white limestone/gravel surface | Tiled limestone texture | Must | Planned |
-| 3 | Blue drum | Cylinder, top rim | Blue metal, label decal | Should | Planned |
-| 4 | Soil and rock piles | Cone/low-poly mesh, several rock instances | Soil texture, limestone texture | Should | Planned |
-| 5 | Road roller | Body, front drum, rear wheels, cab frame | Yellow paint, dark metal | Optional | Planned |
-| 6 | Trees | Cylinder trunk, canopy | Bark texture, leaf colour | Optional | Planned |
-    
-*Status values: Planned / In Progress / Done.*
+| No. | Object | Key Components / Behaviour | Status |
+|---|---|---|---|
+| 1 | Zoomlion crawler excavator | Imported mesh; drives and turns as a whole, with a slewing upper structure. Boom, stick, and bucket are not independently articulated. | Implemented (level 2) |
+| 2 | Ground | Ground and slab model; photo-based ground detailing is still planned. | Implemented |
+| 3 | Blue drums | Three site drums, including one lying down. | Implemented |
+| 4 | Gravel and dirt piles | Separate gravel and dirt props. | Implemented |
+| 5 | Road roller | Rear frame and wheels, articulating front frame, and rotating drum. | Implemented |
+| 6 | Trees and building | Three simple trees and a building backdrop. | Implemented (simplified) |
 
 ### Modelling Scope
 
-**Included:** objects 1–4 (core), objects 5–6 only after the excavator is finished.
+The current scene covers the main machine, roller, ground, and site props. The excavator is at articulation **level 2**: the whole machine can drive and turn, and its upper body can slew. Independent boom, stick, bucket, and hydraulic-cylinder movement is a separate, optional future task.
 
-**Intentionally excluded:** background buildings, drainage ditch, puddles, litter, dry leaves, power lines, distant vehicles and motorcycles. These do not materially change recognisability and are represented by the sky colour and background only.
+The trees, building, and ground remain simplified compared with the reference location. Photo-based ground and distant vegetation work is tracked in [`BACKLOG.md`](BACKLOG.md).
 
 ### Reference Dimensions (Zoomlion ZE215E)
 
-Source: manufacturer specification. Values are transport dimensions.  
-Scale unit: **1.0 = track length on ground (3380 mm)**.
-
-| Dimension | mm | Scene units |
-|---|---|---|
-| Overall length (transport) | 9670 | 2.861 |
-| Overall width | 2800 | 0.828 |
-| Overall height (transport) | 3085 | 0.913 |
-| Tail slewing radius | 2945 | 0.871 |
-| Track gauge | 2200 | 0.651 |
-| Length of track on ground | 3380 | 1.000 |
-
-Boom length, arm length, bucket length, and cylinder anchor points are **not** in the specification. They are measured from the reference photographs (primarily the right-side view) as ratios to the track length, and recorded as estimates.
+The imported excavator is scaled against the manufacturer dimensions and reference photos. The current measured model is approximately **2.75 m wide** and **4.25 m long at the tracks**, compared with project targets of approximately 2.80 m and 4.18 m. Some proportions were estimated from photos.
 
 ### Reference Photographs
 
-<!-- Use original photos taken by the group, or credit the source. -->
+| View | Reference Image |
+|---|---|
+| Front | ![Excavator front reference](assets/reference-images/excavator-front.jpg) |
+| Front-right | ![Excavator front-right reference](assets/reference-images/excavator-front-right.jpg) |
+| Right | ![Excavator right-side reference](assets/reference-images/excavator-right.jpg) |
+| Rear-right | ![Excavator rear-right reference](assets/reference-images/excavator-rear-right.jpg) |
 
-| Object / Location | Reference Image | Source / Date |
-|---|---|---|
-| Excavator | [Front](assets/reference-images/excavator-front.jpg) | Own photo, 3 Nov 2026 |
-| Excavator | [Front-right](assets/reference-images/excavator-front-right.jpg) | Own photo, 3 Nov 2026 |
-| Excavator | [Right](assets/reference-images/excavator-right.jpg) | Own photo, 3 Nov 2026 |
-| Excavator | [Rear-right](assets/reference-images/excavator-rear-right.jpg) | Own photo, 3 Nov 2026 |
+Original site photos are also kept in [`scene/`](scene/).
 
 ### Reference Videos
 
-- **TODO: Video title:** TODO: URL
+No reference video has been provided yet. The assignment requires a video of the real object; add it to the project and link it here and on the application page when available.
 
 ## Animation
 
-| Object | Animation Type | Transformation | Behaviour |
-|---|---|---|---|
-| Excavator upper structure | Swing | Rotate Y | Rotates toward the dig point and back |
-| Boom | Lift/lower | Rotate X at boom pivot | Lowers to the ground and raises |
-| Arm | Curl in/out | Rotate X at arm pivot | Pulls toward the cab while digging |
-| Bucket | Scoop/dump | Rotate X at bucket pivot | Scrapes, curls up, then dumps |
-| Hydraulic cylinders | Extend/retract | Barrel and rod stay aligned between two anchor points | Follows the joint it drives |
-| Camera (optional) | Orbit | TODO | TODO |
+| Object | Animation | Behaviour |
+|---|---|---|
+| Excavator | Drive, turn, and slew | Auto mode runs a looping work sequence; manual input is also available. |
+| Road roller | Drive, articulate, and roll | Moves along the site; wheels and drum rotate according to travel distance. |
+| Camera | Orbit, presets, follow | Orbit manually, select one of four reference views, or follow the excavator. |
 
-**Dig cycle (one loop):** swing to dig point → boom down → arm curl in → bucket scoop → boom up → swing to dump point → bucket dump → swing back.
+**Excavator auto cycle:** drive forward, pause, slew, pause, slew back, and drive back. Pressing a movement key switches to manual mode; `Space` toggles between auto and manual modes.
 
-**Animation Method:** TODO: describe the render loop, delta time, and how animation state feeds the transformations.
+**Animation method:** `WORLD.update(dt, t, input)` updates scene state on each animation frame. Time and input drive node pivots and joint angles; the scene graph propagates parent transforms to child objects.
 
 ## Implementation
 
@@ -172,196 +166,183 @@ Boom length, arm length, bucket length, and cylinder anchor points are **not** i
 
 | Technology | Purpose |
 |---|---|
-| WebGL 2 | Rendering the 3D scene |
-| JavaScript (ES6+) | Scene logic, object management, transformations, animation |
-| HTML5 | Page structure and canvas |
-| CSS3 | Layout and presentation |
+| WebGL 1 | Rendering |
+| JavaScript | Scene graph, camera, rendering, controls, and animation |
+| HTML5 Canvas | Application display |
+| Python and CadQuery | Build-time geometry generation and asset export |
 
-**External libraries:** TODO: "None — all matrix math and rendering are implemented directly" or list each library and its purpose.
+**External libraries at runtime:** None. The browser application uses plain JavaScript and WebGL 1. Python packages are used only by the model-building and verification tools.
+
+### Implementation Map
+
+| Concept | Code entry point | What to explain |
+|---|---|---|
+| Transformations | `src/math.js`, `src/scene.js` | `Mat4` stores column-major matrices; each node composes its local transform and inherits its parent's world transform. |
+| Camera | `src/camera.js`, `src/main.js`, and `SCENE_CONFIG` in `index.html` | The camera supports orbit, configured presets, and a follow pose based on the excavator. |
+| Lighting | `src/shaders.js` and `SCENE_CONFIG.light` in `index.html` | The shaders combine Blinn-Phong lighting with hemisphere ambient and a directional sun. |
+| Textures | `tools/build_textures.py` and the embedded texture assets | Builders generate textures that the page loads as scripts, preserving `file://` compatibility. |
+| Hierarchical modelling | `src/scene.js`, `src/world.js`, and `tools/scene_tree.js` | Parent nodes place children at pivots; the generated SVG visualizes the live world hierarchy. |
+| Animation | `src/world.js` (`WORLD.build` and `WORLD.update`) | Time and held input update machine movement and joints; roller tests cover the rolling relationship. |
 
 ### 3D Transformations
 
-TODO: Explain how translation, rotation, and scaling are composed into model matrices, and the order of multiplication used.
+Scene dimensions use metres. The WebGL scene is right-handed and Y-up; CadQuery builders use Z-up, with the conversion performed by the exporter. Matrices are 4x4 column-major arrays. A node's local transform is composed as translation, rotation, then scale (`T * R * S`), and its world transform is `parentWorld * local`.
 
 ### Camera
 
-TODO: Describe projection type and parameters (FOV, near/far), camera position, view direction, and how the view matrix is built.
+The default camera is a perspective orbit camera, controlled by mouse drag and wheel. Keys `1`-`4` select views aligned with the four reference photos, and `F` toggles a follow camera behind the excavator. The view and projection matrices are built by the project's math utilities.
 
 ### Lighting
 
-TODO: Describe the lighting model (e.g. Phong or Blinn-Phong), light sources and types (directional, point), and where it is computed (vertex or fragment shader).
+The renderer uses a Blinn-Phong model with hemisphere ambient light and one directional sun. The sun and sky/ground colours are configured in `index.html`. The current scene uses a dusk-oriented palette; further lighting polish remains in the backlog.
 
 ### Textures
 
-TODO: List textures, their sources/licences, and how UV coordinates map them to each object.
+The excavator uses the colour texture from its imported Meshy model. Other textures are generated by `tools/build_textures.py`. Texture data is embedded in JavaScript assets and loaded with script tags, so the application does not need network requests or a local server.
 
 ### Controls
 
 | Input | Action |
 |---|---|
-| TODO: e.g. W / A / S / D | TODO: e.g. move camera |
-| TODO: e.g. Mouse drag | TODO: e.g. orbit camera |
-| TODO: e.g. Space | TODO: e.g. pause animation |
+| `W` / `S` | Drive the excavator forward / backward |
+| `A` / `D` | Turn the excavator |
+| `Q` / `E` | Slew the excavator upper structure |
+| `Space` | Toggle auto / manual animation mode |
+| Mouse drag | Orbit the camera |
+| Mouse wheel | Zoom the camera |
+| `1`-`4` | Select a camera preset |
+| `F` | Toggle the excavator follow camera |
+
+For automated checks and still renders, `?test` and `?shot` URL modes are also available.
+
+### Challenge Practice (Repository-Based)
+
+Use these prompts to rehearse small, explainable changes using existing project code. They are practice pointers, not evidence that a live challenge has already been completed.
+
+| Challenge prompt | Where to make the change |
+|---|---|
+| Make the sun warmer or change its direction. | Adjust `SCENE_CONFIG.light.sunColor` or `sunDir` in `index.html`. |
+| Change the sky or ground ambient colour. | Adjust `SCENE_CONFIG.light.skyColor` or `groundColor` in `index.html`. |
+| Move a camera preset or change its zoom. | Edit that preset's `target` or `distance` in `SCENE_CONFIG.cameraPresets` in `index.html`. |
+| Change the default orbit camera framing. | Edit `SCENE_CONFIG.camera` in `index.html`. |
+| Reposition the excavator or road roller. | Change the model root pivot in `WORLD.build` in `src/world.js`. |
+| Explain or adjust manual driving and slewing. | Trace the input handling in `WORLD.update` in `src/world.js`; controls are W/S, A/D, and Q/E. |
+| Change the excavator's automatic work cycle. | Edit the auto-mode state updates in `WORLD.update` in `src/world.js`; keep the movement tests passing. |
+| Make the road roller travel or roll differently. | Trace roller movement and rotation in `src/world.js`; `tests/roller.test.js` checks the rolling relationship. |
+| Change a generated texture. | Edit the relevant generator in `tools/build_textures.py`, then rebuild and check the embedded texture asset. |
+| Add a child model part and show it in the tree. | Define the part and parent in a `builders/*.py` model, export it with `tools/export.py`, then update scene setup and regenerate `docs/scene_tree.svg` with `tools/scene_tree.js`. |
 
 ### Technical Challenges
 
 | Challenge | Cause | Solution |
 |---|---|---|
-| TODO | TODO | TODO |
+| Dark or bright patches on the imported excavator | Some imported triangles have inward winding | Preserve the imported smooth normals and draw the imported model double-sided; regression checks cover the shading behaviour. |
+| Slow initial page load | Large embedded excavator mesh and texture assets | Keep generated assets embedded for `file://` compatibility; the model and texture payloads are currently large. |
+| Reliable render verification | Browser texture decoding can outlast a virtual-clock wait | The render check waits in real time for assets to decode. |
 
 ## Hierarchical Modelling
 
-Child objects inherit the transformations of their parents. Each articulated joint is a **pivot node** whose origin sits at the physical joint, so rotating it moves every descendant around the correct point.
+The live scene graph uses `SceneNode` pivots. A child inherits its parent's world transform, so moving a machine root moves its complete model, while a rotating joint affects only its descendants. The road roller's rolling parts and front articulation are represented as separate nodes.
 
-```mermaid
-graph TD
-    Scene[Scene Root] --> Camera
-    Scene --> Lighting
-    Scene --> Ground
-    Scene --> Drum[Blue Drum]
-    Scene --> Roller[Road Roller - optional]
-    Scene --> Trees[Trees - optional]
-    Scene --> Exc[Excavator Root]
+The generated tree is kept in sync with the scene graph by `tools/scene_tree.js`:
 
-    Lighting --> Dir[Directional Light - low sun]
-    Lighting --> Amb[Ambient Light]
+![Generated scene graph](docs/scene_tree.svg)
 
-    Ground --> Mound[Soil Mound]
-    Ground --> Rocks[Rock Instances]
+| Node | Role |
+|---|---|
+| `excavator` | Machine root; drive and heading |
+| `undercarriage` | Excavator lower structure |
+| `upper` | Excavator upper structure; yaw slew |
+| `roller` | Road roller root; drive |
+| `rear_frame` | Rear structure and wheel parents |
+| `front_frame` | Articulating front structure |
+| `drum` | Road roller drum; rolling rotation |
 
-    Roller --> RBody[Body]
-    Roller --> RDrum[Front Drum]
-    Roller --> RWheels[Rear Wheels]
-
-    Exc --> Under[Undercarriage]
-    Exc --> Swing[Swing Pivot - rotate Y]
-
-    Under --> TrackFrame[Track Frame]
-    Under --> LTrack[Left Track]
-    Under --> RTrack[Right Track]
-
-    Swing --> CW[Counterweight + Decal]
-    Swing --> Hood[Engine Hood]
-    Swing --> Cover[Side Cover]
-    Swing --> Cab[Cab: frame, glass, door]
-    Swing --> BoomPivot[Boom Pivot - rotate X]
-
-    BoomPivot --> Boom[Boom + Decals]
-    BoomPivot --> BoomCylL[Boom Cylinder L]
-    BoomPivot --> BoomCylR[Boom Cylinder R]
-    BoomPivot --> ArmPivot[Arm Pivot - rotate X]
-
-    ArmPivot --> Arm[Arm]
-    ArmPivot --> ArmCyl[Arm Cylinder]
-    ArmPivot --> BucketPivot[Bucket Pivot - rotate X]
-
-    BucketPivot --> Bucket[Bucket + Teeth]
-    BucketPivot --> BucketCyl[Bucket Cylinder]
-    BucketPivot --> Link[Bucket Linkage: 2 links]
-```
-
-### Node Naming Contract
-
-Node names used in the diagram and in the code must match. Any change must be updated in both places.
-
-| Diagram node | Code identifier | Local transform |
-|---|---|---|
-| Excavator Root | `excavator` | translate + yaw of the whole machine |
-| Swing Pivot | `swing` | rotate Y |
-| Boom Pivot | `boomPivot` | rotate X |
-| Arm Pivot | `armPivot` | rotate X |
-| Bucket Pivot | `bucketPivot` | rotate X |
-
-**Cylinders:** a cylinder needs two parts (barrel on the parent, rod on the moving part). Barrel and rod are re-oriented each frame between two anchor points, so the rod extends and retracts instead of rotating rigidly with the boom. If time is short, a single scaled and rotated cylinder is the fallback.
-
-TODO: explain the actual implementation (matrix stack or scene-graph nodes) and one concrete propagation example.
+The excavator is currently level 2; separate arm joints and hydraulic-cylinder motion are not implemented.
 
 ## Visual Documentation
 
 ### Application Screenshot
 
-![Application Screenshot](assets/screenshots/scene.png)
+A final scene screenshot has not been added to the repository yet.
 
 ### Comparison with the Real Environment
 
-| Object | Actual Environment | WebGL Implementation |
+| Object | Reference | WebGL implementation |
 |---|---|---|
-| TODO | `<img src="assets/reference-images/TODO.jpg" width="320">` | `<img src="assets/screenshots/TODO.png" width="320">` |
-| TODO | `<img src="assets/reference-images/TODO.jpg" width="320">` | `<img src="assets/screenshots/TODO.png" width="320">` |
+| Excavator, front | [Front photo](assets/reference-images/excavator-front.jpg) | Final comparison screenshot not yet added |
+| Excavator, side | [Right-side photo](assets/reference-images/excavator-right.jpg) | Final comparison screenshot not yet added |
+| Construction site | Photos in [`scene/`](scene/) | Final comparison screenshot not yet added |
 
 ### Animation Demonstration
 
-- **Video:** TODO: URL
-- **Format:** TODO: e.g. MP4
+- **Video:** Not available yet; the real-site video remains a required human-provided item.
 
 ## Task Distribution
 
 | Member | SID | Modules / Objects Owned | Details |
 |---|---|---|---|
-| Mikail Ibrahim Hakim | 5025241046 | Implementation | Geometry and modelling, hierarchy, animation, lighting, textures, camera, integration, main application page |
-| Bara Semangat Rohmani | 5025241144 | Documentation, references, design specification | Repository, README and docs; reference photos and videos; object selection and scope; hierarchy tree and animation design; measuring proportions from photos; verifying the model against references |
+| Mikail Ibrahim Hakim | 5025241046 | Implementation | Geometry and modelling, hierarchy, animation, lighting, textures, camera, integration, and application page |
+| Bara Semangat Rohmani | 5025241144 | Documentation, references, design specification | Repository documentation, reference photos and video, object selection and scope, hierarchy and animation design, proportions from photos, and model/reference comparison |
 
-Both members are able to explain the full implementation, not only their own modules.
+Both members should be prepared to explain the complete implementation, not only their assigned parts.
 
 ## Project Structure
 
-<!-- Adjust to match the actual repository and remove unused entries. -->
-
 ```text
 its-environment-3d-scene/
-├── README.md
-├── index.html
-├── src/
-│   ├── main.js
-│   ├── style.css
-│   └── ...
-├── assets/
-│   ├── reference-images/
-│   ├── reference-videos/
-│   ├── screenshots/
-│   └── textures/
-└── docs/
-    ├── ASSIGNMENT.md
-    └── scene-hierarchy.md
+|-- index.html                 Application page and scene configuration
+|-- README.md
+|-- AGENTS.md                  Project instructions
+|-- BACKLOG.md                 Planned work and acceptance checks
+|-- CONVENTIONS.md             Coordinate, matrix, and runtime rules
+|-- ENGINE_API.md              Engine interfaces
+|-- PROGRESS.md                Decisions and completed work
+|-- SETUP.md                   Windows setup and checks
+|-- builders/                  CadQuery model builders
+|-- assets/
+|   |-- models/                Generated model JavaScript
+|   |-- textures*.js           Generated embedded textures
+|   |-- reference-images/      Named reference photos
+|   |-- reference-videos/      Reference video (not available yet)
+|   `-- screenshots/           Final screenshots (not added yet)
+|-- docs/
+|   |-- BRIEF.md               Assignment requirements
+|   |-- CAMERA.md              Camera controls and presets
+|   |-- HANDOFF_SITE.md        Site-fidelity work specification
+|   `-- scene_tree.svg         Generated live scene hierarchy
+|-- scene/                     Original site reference photos
+|-- spec/                      Model dimensions and import settings
+|-- src/                       WebGL engine, camera, and world logic
+|-- tests/                     Node tests and browser probe page
+`-- tools/                     Export, texture, tree, and check scripts
 ```
 
 ## Running the Project
 
-**Requirements:** a modern browser with WebGL 2 support, and a local web server. A server is required because browsers block loading textures from `file://` URLs.
+**View the application:** open `index.html` directly in a modern browser with WebGL 1 support. The page is designed to work from `file://`; a local web server is not required.
 
-Choose one of the following options.
-
-### Option 1: Command line
+**Run the project checks:** install the Python and Node.js prerequisites described in [`SETUP.md`](SETUP.md), then run from the project root:
 
 ```bash
-# From the project root:
-python -m http.server 8000
-# or
-npx serve .
+python tools/check_all.py
 ```
 
-Then open **http://localhost:8000** (for `npx serve`, use the URL printed in the terminal).
-
-### Option 2: VS Code Live Server
-
-1. Install the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension.
-2. Open the project root (the folder containing `index.html`) in VS Code.
-3. Right-click `index.html` and select **Open with Live Server**.
-4. The app opens at `http://127.0.0.1:5500` and reloads on file changes.
-
-TODO: Add any project-specific setup notes (browser tested, known compatibility issues).
+The check script runs the project checks and prints a summary. Re-exporting models is only needed when their builders or inputs change.
 
 ## Limitations
 
-- The excavator is built from primitives and custom meshes, so fine details (hoses, bolts, grilles) are simplified or omitted.
-- Boom, arm, and cylinder proportions are estimated from photographs; some parts are partly occluded by trees in the photos.
-- Only the excavator has articulated animation; other objects are static unless time allows.
-- The real site is temporary and changes over time; the scene reflects one day's conditions.
-- TODO: technical limitations after implementation.
+- The excavator is at articulation level 2; the boom, stick, bucket, and hydraulic cylinders do not move independently.
+- The road roller, trees, building, and some site props are simplified compared with the real photos.
+- The ground colour and site details do not yet match the light limestone construction area closely.
+- Photo-based ground, vegetation, and backdrop improvements remain in progress.
+- The main page does not yet include the reference photos, real-site video, task distribution, or hierarchy diagram required for submission.
+- The real site is temporary; the scene represents the conditions in the available reference photos.
 
 ## References
 
-- [WebGL 2 Specification](https://www.khronos.org/webgl/)
+- [WebGL 1 Specification](https://www.khronos.org/registry/webgl/specs/latest/1.0/)
 - [MDN WebGL API Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
-- TODO: Texture sources and licences
-- TODO: Tutorials or modelling resources used
+- Project reference photographs: [`assets/reference-images/`](assets/reference-images/) and [`scene/`](scene/)
+- Project conventions and engine interface: [`CONVENTIONS.md`](CONVENTIONS.md), [`ENGINE_API.md`](ENGINE_API.md)
+- Meshy model and colour texture are imported project inputs; confirm their attribution and licence before submission.
